@@ -860,27 +860,26 @@ function telaConsulta(){
   };
   let corpo = '';
   if (!S.carregado) corpo = `<div class="vazio">Carregando serviços…</div>`;
-  else if (!q) corpo = `<div class="vazio">Digite o número da O.S. ou o nome do cliente para ver o andamento dos materiais.</div>`;
   else {
-    const encontrados = S.servicos.filter(s => norm(s.os).includes(q) || norm(s.cliente).includes(q) || norm(s.material).includes(q));
-    const achados = encontrados.filter(s=>{
-      const fim = info(s).finalizado;
-      return filtro==='todos' || (filtro==='finalizados' ? fim : !fim);
-    });
-    if (!encontrados.length) corpo = `<div class="vazio">Nenhum serviço encontrado para “${esc(S.buscaConsulta)}”.</div>`;
-    else if (!achados.length) corpo = `<div class="vazio">Nenhum serviço ${filtro==='finalizados'?'finalizado':'em produção'} para “${esc(S.buscaConsulta)}”. Toque em “Todos” para ver ${encontrados.length>1?`os ${encontrados.length} encontrados`:'o encontrado'}.</div>`;
-    else {
+    // sem busca: só o que está no painel (sem arquivados); com busca: procura em tudo
+    const base = S.servicos.map(s=>({s, i:info(s)})).filter(x=> q ? (norm(x.s.os).includes(q) || norm(x.s.cliente).includes(q) || norm(x.s.material).includes(q)) : !x.i.arquivado);
+    const lista = base.filter(x=> filtro==='todos' || (filtro==='finalizados' ? x.i.finalizado : !x.i.finalizado));
+    if (!lista.length){
+      const nomeFiltro = filtro==='finalizados' ? 'finalizado' : (filtro==='andamento' ? 'em produção' : '');
+      corpo = q
+        ? (base.length ? `<div class="vazio">Nenhum material ${nomeFiltro} para “${esc(S.buscaConsulta)}”. Toque em “Todos” para ver ${base.length>1?`os ${base.length} encontrados`:'o encontrado'}.</div>`
+                       : `<div class="vazio">Nenhum serviço encontrado para “${esc(S.buscaConsulta)}”.</div>`)
+        : `<div class="vazio">Nenhum material ${nomeFiltro || 'cadastrado'} no momento.</div>`;
+    } else {
       const grupos = new Map();
-      achados.sort((a,b)=>(b.criadoEm||0)-(a.criadoEm||0)).forEach(s=>{
-        const k = norm(s.cliente); if(!grupos.has(k)) grupos.set(k,{nome:s.cliente,itens:[]});
-        grupos.get(k).itens.push(s);
-      });
-      const unico = achados.length === 1;
-      corpo = [...grupos.values()].map(g=>`
-        <section class="grupo-cli">
-          <h3><b>${esc(g.nome)}</b> · ${g.itens.length} ${g.itens.length>1?'materiais':'material'}</h3>
-          <div class="lista">${g.itens.map(s=>cartaoConsulta(s, unico)).join('')}</div>
-        </section>`).join('');
+      const recente = x => x.s.atualizadoEm || x.s.criadoEm || 0;
+      lista.forEach(x=>{ const ch = norm(x.s.cliente); if (!grupos.has(ch)) grupos.set(ch, {nome:x.s.cliente, itens:[]}); grupos.get(ch).itens.push(x); });
+      const ordenados = [...grupos.values()].map(g=>{
+        g.itens.sort((a,b)=> (a.i.atrasado!==b.i.atrasado ? (a.i.atrasado?-1:1) : recente(b)-recente(a)));
+        g.atrasado = g.itens.some(x=>x.i.atrasado); g.recente = Math.max(...g.itens.map(recente));
+        return g;
+      }).sort((a,b)=> a.atrasado!==b.atrasado ? (a.atrasado?-1:1) : b.recente-a.recente);
+      corpo = `<div class="grade">${ordenados.map(g=>quadroCliente(g, true)).join('')}</div>`;
     }
   }
   return `
@@ -979,7 +978,7 @@ function telaProducao(){
     <div class="busca-linha"><input id="busca-adm" class="busca-peq" type="search" autocomplete="off" placeholder="Filtrar por O.S., cliente ou material" value="${esc(S.buscaAdm)}"></div>
     ${conteudo}`;
 }
-function quadroCliente(g){
+function quadroCliente(g, leitura){
   const pasta = g.itens.length > 1;
   const primeiro = g.itens[0].s;
   return `
@@ -988,18 +987,18 @@ function quadroCliente(g){
       ${pasta ? ICONE_PASTA : ''}
       <span class="cli" title="${esc(g.nome)}">${esc(g.nome)}</span>
       ${pasta ? `<span class="contagem">${g.itens.length} materiais</span>` : ''}
-      <button class="mais" data-novo-cliente="${esc(primeiro.id)}" title="Adicionar outro material para este cliente">+</button>
+      ${leitura ? '' : `<button class="mais" data-novo-cliente="${esc(primeiro.id)}" title="Adicionar outro material para este cliente">+</button>`}
     </div>
-    <div class="itens">${g.itens.map(({s,i})=>`
-      <div class="item" data-ver="${esc(s.id)}" tabindex="0" role="button">
-        <div class="item-l1"><span class="os-tag">O.S. ${esc(s.os)}</span><span class="mat-nome">${esc(s.material)}</span></div>
+    <div class="itens">${g.itens.map(({s,i})=>{ const nl = leitura ? naoLidasServico(s.id) : 0; return `
+      <div class="item" ${leitura ? `data-consulta-ver="${esc(s.id)}"` : `data-ver="${esc(s.id)}"`} tabindex="0" role="button">
+        <div class="item-l1"><span class="os-tag">O.S. ${esc(s.os)}</span><span class="mat-nome">${esc(s.material)}</span>${nl ? `<span class="novas-msg">${ICONE_MSG}${nl}</span>` : ''}</div>
         <div class="item-l2">${[s.quantidade, s.maquina, s.prazo?'Prazo '+fmtPrazo(s.prazo):''].filter(Boolean).map(esc).join(' · ')}</div>
         <div class="item-l3">
           ${selo(i)}
           <div class="barra ${i.finalizado?'ok':''}"><i style="width:${i.pct}%"></i></div>
-          ${i.finalizado ? '' : `<button class="ok-redondo" data-avancar="${esc(s.id)}" title="Concluir: ${esc(i.atual?i.atual.n:'')}">✓ Concluir</button>`}
+          ${leitura || i.finalizado ? '' : `<button class="ok-redondo" data-avancar="${esc(s.id)}" title="Concluir: ${esc(i.atual?i.atual.n:'')}">✓ Concluir</button>`}
         </div>
-      </div>`).join('')}
+      </div>`; }).join('')}
     </div>
   </section>`;
 }
@@ -1137,6 +1136,39 @@ function renderModal(){
   const raiz = $('#modal-raiz');
   if (!S.modal || !S.eu){ raiz.innerHTML=''; raiz.dataset.form=''; return; }
   const m = S.modal;
+  if (m.tipo==='consulta'){
+    const s = S.servicos.find(x=>x.id===m.id);
+    if (!s){ fecharModal(); return; }
+    const i = info(s);
+    // preserva o que está sendo digitado e a rolagem
+    const ta = raiz.querySelector('textarea'); const texto = ta ? ta.value : ''; const focado = ta && document.activeElement===ta; const pos = focado ? ta.selectionStart : 0;
+    const fundo = raiz.querySelector('.fundo-modal'); const rol = fundo ? fundo.scrollTop : 0;
+    const corpoMsg = raiz.querySelector('[data-thread-chave]'); const fimMsg = !corpoMsg || corpoMsg.scrollHeight - corpoMsg.scrollTop - corpoMsg.clientHeight < 40; const topMsg = corpoMsg ? corpoMsg.scrollTop : 0;
+    raiz.dataset.form = '';
+    raiz.innerHTML = `
+    <div class="fundo-modal" data-fundo>
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-cab"><span class="os-tag">O.S. ${esc(s.os)}</span><h2>${esc(s.material)}</h2><button class="fechar" data-fechar aria-label="Fechar">×</button></div>
+        <div class="modal-corpo">
+          <div class="info-grid">
+            <div><small>Cliente</small><b>${esc(s.cliente)}</b></div>
+            <div><small>Quantidade</small><b>${esc(s.quantidade||'—')}</b></div>
+            <div><small>Impressora</small><b>${esc(s.maquina||'—')}</b></div>
+            <div><small>Prazo</small><b>${fmtPrazo(s.prazo)}</b></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">${selo(i)}<span class="mat-sub">${i.feitas}/${i.total} etapas</span></div>
+          ${linhaDoTempo(s,false)}
+          ${s.obs?`<div class="obs">${esc(s.obs)}</div>`:''}
+          ${blocoMensagensServico(s)}
+        </div>
+      </div>
+    </div>`;
+    const novaTa = raiz.querySelector('textarea');
+    if (novaTa){ novaTa.value = texto; ajustarAltura(novaTa); if (focado){ novaTa.focus(); try{ novaTa.setSelectionRange(pos,pos); }catch(e){} } }
+    if (rol) raiz.querySelector('.fundo-modal').scrollTop = rol;
+    const cm = raiz.querySelector('[data-thread-chave]'); if (cm) cm.scrollTop = fimMsg ? cm.scrollHeight : topMsg;
+    return;
+  }
   if (m.tipo==='calendario'){
     raiz.dataset.form = '';
     const corpo = raiz.querySelector('.fundo-modal'); const rol = corpo ? corpo.scrollTop : 0;
@@ -1446,7 +1478,7 @@ async function enviarMensagem(form, dados){
     await exec(sb.from('mensagens').insert({tipo:'servico', texto, ...dados}));
     ta.value = '';
     await recarregar('mensagens');
-    const el = app.querySelector(`[data-rascunho="${CSS.escape(ta.dataset.rascunho)}"]`); if (el) el.focus();
+    const el = document.querySelector(`[data-rascunho="${CSS.escape(ta.dataset.rascunho)}"]`); if (el) el.focus();
   } catch(e){ erroGravar(e); }
   btn.disabled = false;
 }
@@ -1800,7 +1832,7 @@ document.addEventListener('click', e=>{
   if ((el = t.closest('[data-cal-item]'))){
     const s = S.servicos.find(x=>x.id===el.dataset.calItem); if (!s) return;
     if (S.eu.admin) abrirModal({tipo:'ver', id:s.id});
-    else { fecharModal(); S.aba = 'consulta'; S.buscaConsulta = s.os; S.abertos.add(s.id); render(); window.scrollTo(0,0); }
+    else abrirModal({tipo:'consulta', id:s.id});
     return;
   }
   if ((el = t.closest('[data-msg-conv]'))){ S.msgSel = el.dataset.msgConv; S.msgNovo = false; S.confirmar = null; render(); if (ehCelular()) window.scrollTo(0,0); return; }
@@ -1812,6 +1844,7 @@ document.addEventListener('click', e=>{
   if ((el = t.closest('[data-apagar-hist]'))){ const c='hist:'+el.dataset.apagarHist; if (S.confirmar===c) apagarRegistro(el.dataset.apagarHist); else { S.confirmar=c; render(); } return; }
   if ((el = t.closest('[data-limpar-hist]'))){ if (S.confirmar==='limpar-hist') limparHistorico(); else { S.confirmar='limpar-hist'; render(); } return; }
   if ((el = t.closest('[data-zerar]'))){ if (S.confirmar==='zerar') zerarFinalizados(); else { S.confirmar='zerar'; render(); } return; }
+  if ((el = t.closest('[data-consulta-ver]'))){ if (S.eu.admin) abrirModal({tipo:'ver', id:el.dataset.consultaVer}); else abrirModal({tipo:'consulta', id:el.dataset.consultaVer}); return; }
   if ((el = t.closest('[data-filtro-cons]'))){ S.filtroCons = el.dataset.filtroCons; render(); return; }
   if ((el = t.closest('[data-filtro]'))){ S.filtroAdm = el.dataset.filtro; render(); return; }
   if ((el = t.closest('[data-acao="novo"]'))){ abrirModal({tipo:'novo'}); return; }
@@ -1837,6 +1870,7 @@ document.addEventListener('keydown', e=>{
   if (e.key==='Enter' && !e.shiftKey && e.target.classList && e.target.classList.contains('msg-input') && !ehCelular()){ e.preventDefault(); e.target.form.requestSubmit(); return; }
   if (e.key==='Escape' && S.modal) fecharModal();
   if (e.key==='Enter' && e.target.matches && e.target.matches('.item[data-ver]')) abrirModal({tipo:'ver', id:e.target.dataset.ver});
+  if (e.key==='Enter' && e.target.matches && e.target.matches('.item[data-consulta-ver]')) e.target.click();
 });
 document.addEventListener('submit', e=>{
   const f = e.target; e.preventDefault();
