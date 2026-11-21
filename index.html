@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grampel – Acompanhamento de Serviços</title>
+<meta name="theme-color" content="#033584">
+<meta name="description" content="Acompanhamento de serviços da Grampel Soluções Gráficas">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Grampel">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --azul:#033584; --azul-esc:#022766; --azul-claro:#e8eef8; --azul-med:#c7d5ee;
+  --tinta:#0e2246; --cinza:#5b6b80; --linha:#dde4ee; --fundo:#f3f6fa; --branco:#fff;
+  --verde:#13804b; --verde-claro:#e3f5ec; --ambar:#9a5600; --ambar-claro:#fff3df;
+  --vermelho:#c0362c; --vermelho-claro:#fdecea; --raio:12px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--fundo);color:var(--tinta);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+
+/* Topo */
+header{background:var(--azul);color:#fff;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(2,30,80,.25)}
+.topo{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:calc(10px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) 10px calc(20px + env(safe-area-inset-left));flex-wrap:wrap}
+.topo img{height:42px;display:block}
+.topo .esp{flex:1}
+.abas{display:flex;gap:4px;background:rgba(255,255,255,.12);padding:4px;border-radius:10px;flex-wrap:wrap}
+.abas button{background:transparent;border:0;color:#fff;padding:7px 13px;border-radius:7px;font-weight:600;font-size:14px;opacity:.85}
+.abas button.ativa{background:#fff;color:var(--azul);opacity:1}
+.quem{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600}
+.quem button{background:rgba(255,255,255,.14);border:0;color:#fff;border-radius:8px;padding:6px 11px;font-size:13px;font-weight:600}
+.quem button:hover{background:rgba(255,255,255,.25)}
+
+main{max-width:1240px;margin:0 auto;padding:24px 20px 60px}
+
+/* Login */
+.tela-login{min-height:100vh;display:grid;place-items:center;background:var(--azul);padding:24px}
+.caixa-login{width:100%;max-width:380px;text-align:center}
+.caixa-login img{width:260px;max-width:80%;margin-bottom:26px}
+.caixa-login form{background:#fff;border-radius:16px;padding:26px 24px;text-align:left;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.caixa-login h2{margin:0 0 4px;font-size:19px}
+.caixa-login p{margin:0 0 16px;color:var(--cinza);font-size:14px}
+.caixa-login label.campo{margin-bottom:12px}
+.caixa-login .btn{width:100%;justify-content:center;margin-top:6px;padding:12px}
+
+/* Avisos */
+.aviso{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:28px;text-align:center;color:var(--cinza);max-width:560px;margin:60px auto}
+.aviso h2{color:var(--tinta);margin:0 0 8px;font-size:20px}
+.faixa{background:var(--ambar-claro);color:var(--ambar);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:14px}
+
+/* Consulta */
+.busca-hero{background:linear-gradient(180deg,var(--azul) 0%,var(--azul-esc) 100%);border-radius:16px;padding:30px 28px;color:#fff;margin-bottom:22px}
+.busca-hero h1{margin:0 0 4px;font-size:22px}
+.busca-hero p{margin:0 0 16px;opacity:.85}
+.campo-busca{position:relative}
+.campo-busca input{width:100%;border:0;border-radius:12px;padding:16px 18px 16px 50px;font-size:17px;outline:none;box-shadow:0 4px 18px rgba(0,0,0,.15);color:var(--tinta)}
+.campo-busca svg{position:absolute;left:17px;top:50%;transform:translateY(-50%);color:var(--azul)}
+.grupo-cli{margin-bottom:22px}
+.grupo-cli h3{font-size:14px;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em;margin:0 0 10px;font-weight:600}
+.grupo-cli h3 b{color:var(--tinta)}
+.vazio{color:var(--cinza);text-align:center;padding:40px 10px}
+
+.lista{display:flex;flex-direction:column;gap:10px}
+.cartao{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);overflow:hidden}
+.cartao-cab{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:14px 16px;width:100%;background:none;border:0;text-align:left}
+.cartao-cab:hover{background:#fafcff}
+.os-tag{background:var(--azul-claro);color:var(--azul);font-weight:700;border-radius:8px;padding:5px 9px;font-size:12.5px;white-space:nowrap}
+.mat-nome{font-weight:600}
+.mat-sub{color:var(--cinza);font-size:13px}
+.barra{height:6px;background:var(--azul-claro);border-radius:999px;overflow:hidden;margin-top:8px}
+.barra i{display:block;height:100%;background:var(--azul);border-radius:999px}
+.barra.ok i{background:var(--verde)}
+.selo{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.selo.prod{background:var(--azul-claro);color:var(--azul)}
+.selo.fim{background:var(--verde-claro);color:var(--verde)}
+.selo.esp{background:#eef1f5;color:var(--cinza)}
+.selo.atr{background:var(--vermelho-claro);color:var(--vermelho)}
+.selo .pt{width:7px;height:7px;border-radius:50%;background:currentColor}
+.dir{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.detalhe{border-top:1px solid var(--linha);padding:16px 18px 18px;background:#fbfdff}
+
+/* Linha do tempo */
+.tl{list-style:none;margin:0;padding:0}
+.tl-grupo{font-size:12px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px}
+.tl-grupo:first-child{margin-top:0}
+.tl li{display:flex;gap:12px;align-items:flex-start;padding:7px 0}
+.tl .marca{width:24px;height:24px;border-radius:50%;flex:none;display:grid;place-items:center;border:2px solid var(--linha);background:#fff;color:#fff;font-size:13px;font-weight:700}
+.tl li.feito .marca{background:var(--verde);border-color:var(--verde)}
+.tl li.atual .marca{border-color:var(--azul);background:var(--azul);box-shadow:0 0 0 4px var(--azul-med)}
+.tl .nome{font-weight:500}
+.tl li.pend .nome{color:var(--cinza)}
+.tl li.atual .nome{font-weight:700;color:var(--azul)}
+.tl .quando{font-size:12px;color:var(--cinza)}
+.tl button.toggle{all:unset;display:flex;gap:12px;align-items:flex-start;cursor:pointer;width:100%;border-radius:8px}
+.tl button.toggle:hover .marca{border-color:var(--azul)}
+.tl button.toggle:focus-visible{outline:2px solid var(--azul);outline-offset:3px}
+.obs{background:#fff;border:1px dashed var(--linha);border-radius:10px;padding:10px 12px;margin-top:14px;font-size:14px;white-space:pre-wrap}
+
+/* Produção */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:14px 16px}
+.kpi .v{font-size:26px;font-weight:700;color:var(--azul)}
+.kpi .r{font-size:13px;color:var(--cinza)}
+.kpi.vermelho .v{color:var(--vermelho)} .kpi.verde .v{color:var(--verde)}
+.barra-ferr{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.busca-peq{flex:1;min-width:220px;border:1px solid var(--linha);border-radius:10px;padding:10px 14px;background:#fff;outline:none}
+.busca-peq:focus{border-color:var(--azul);box-shadow:0 0 0 3px var(--azul-med)}
+.chips{display:flex;gap:6px}
+.chips button{border:1px solid var(--linha);background:#fff;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:var(--cinza)}
+.chips button.ativa{background:var(--azul);border-color:var(--azul);color:#fff}
+.btn{border:0;border-radius:10px;padding:10px 16px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+.btn-pri{background:var(--azul);color:#fff}.btn-pri:hover{background:var(--azul-esc)}
+.btn-sec{background:#fff;border:1px solid var(--linha);color:var(--tinta)}.btn-sec:hover{border-color:var(--azul);color:var(--azul)}
+.btn-ok{background:var(--verde);color:#fff}
+.btn-perigo{background:#fff;border:1px solid #f0c7c3;color:var(--vermelho)}
+.btn-perigo.conf{background:var(--vermelho);color:#fff;border-color:var(--vermelho)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn-peq{padding:6px 11px;font-size:13px}
+
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;align-items:start}
+.quadro{background:#fff;border:1px solid var(--linha);border-radius:14px;box-shadow:0 1px 3px rgba(3,53,132,.05);position:relative}
+.quadro.pasta{margin-top:12px;border-top-left-radius:0}
+.quadro.pasta::before{content:"";position:absolute;left:-1px;top:-13px;width:120px;height:13px;background:#fff;border:1px solid var(--linha);border-bottom:0;border-radius:10px 14px 0 0}
+.quadro-cab{display:flex;align-items:center;gap:10px;padding:14px 16px 10px}
+.quadro-cab .cli{font-weight:700;font-size:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.quadro-cab svg{color:var(--azul);flex:none}
+.contagem{background:var(--azul);color:#fff;border-radius:999px;font-size:12px;font-weight:700;padding:2px 9px}
+.mais{background:none;border:1px solid var(--linha);border-radius:8px;width:30px;height:30px;font-size:18px;line-height:1;color:var(--azul);display:grid;place-items:center;flex:none}
+.mais:hover{border-color:var(--azul);background:var(--azul-claro)}
+.itens{padding:0 10px 10px;display:flex;flex-direction:column;gap:8px}
+.item{border:1px solid var(--linha);border-radius:10px;padding:10px 12px;cursor:pointer;background:#fff}
+.item:hover{border-color:var(--azul-med);background:#fafcff}
+.item:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.item-l1{display:flex;align-items:center;gap:8px}
+.item-l1 .mat-nome{flex:1;min-width:0}
+.item-l2{font-size:13px;color:var(--cinza);margin-top:2px}
+.item-l3{display:flex;align-items:center;gap:10px;margin-top:8px}
+.item-l3 .barra{flex:1;margin:0}
+.ok-redondo{border:0;background:var(--verde);color:#fff;border-radius:8px;padding:5px 10px;font-size:12.5px;font-weight:600;white-space:nowrap;max-width:170px;overflow:hidden;text-overflow:ellipsis}
+.ok-redondo:hover{filter:brightness(1.08)}
+
+/* Painéis de cadastro / histórico */
+.paineis{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.painel{background:#fff;border:1px solid var(--linha);border-radius:14px;padding:18px 20px}
+.painel h2{margin:0 0 4px;font-size:17px}
+.painel p.dica{margin:0 0 14px}
+.add-linha{display:flex;gap:8px;margin-bottom:12px}
+.add-linha input{flex:1}
+.itens-cad{list-style:none;margin:0;padding:0}
+.itens-cad li{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--linha)}
+.itens-cad li:last-child{border-bottom:0}
+.itens-cad li span{flex:1}
+.x{background:none;border:0;color:var(--cinza);font-size:13px;font-weight:600;border-radius:7px;padding:5px 9px}
+.x:hover{background:var(--vermelho-claro);color:var(--vermelho)}
+.x.conf{background:var(--vermelho);color:#fff}
+.tabela{width:100%;border-collapse:collapse;font-size:14px}
+.tabela th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--cinza);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--linha)}
+.tabela td{padding:10px;border-bottom:1px solid var(--linha);vertical-align:top}
+.tabela tr:last-child td{border-bottom:0}
+.tag-tipo{font-size:12px;font-weight:600;border-radius:999px;padding:3px 9px}
+.tag-tipo.adm{background:var(--azul);color:#fff}
+.tag-tipo.acomp{background:#eef1f5;color:var(--cinza)}
+.hist-lista{list-style:none;margin:0;padding:0}
+.hist-lista li{padding:9px 0;border-bottom:1px solid var(--linha);font-size:14px}
+.hist-lista li:last-child{border-bottom:0}
+.hist-lista .h-meta{font-size:12px;color:var(--cinza)}
+.hist-lista b{font-weight:600}
+
+/* Modal */
+.fundo-modal{position:fixed;inset:0;background:rgba(5,20,50,.5);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:40px 14px;overflow:auto}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:660px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal-cab{display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--linha)}
+.modal-cab h2{margin:0;font-size:18px;flex:1}
+.modal-corpo{padding:20px 22px}
+.modal-rod{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:14px 22px;border-top:1px solid var(--linha);background:#fafcff;border-radius:0 0 16px 16px;flex-wrap:wrap}
+.fechar{background:none;border:0;font-size:24px;line-height:1;color:var(--cinza);padding:4px 8px;border-radius:8px}
+.fechar:hover{background:var(--azul-claro)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid .full{grid-column:1/-1}
+label.campo{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--cinza)}
+label.campo input,label.campo textarea,label.campo select,.add-linha input{border:1px solid var(--linha);border-radius:10px;padding:10px 12px;font-weight:400;color:var(--tinta);outline:none;background:#fff}
+label.campo input:focus,label.campo textarea:focus,label.campo select:focus,.add-linha input:focus{border-color:var(--azul);box-shadow:0 0 0 3px var(--azul-med)}
+.rotulo{font-size:13px;font-weight:600;color:var(--cinza);margin-bottom:6px}
+.checks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.checks label{display:flex;align-items:center;gap:8px;border:1px solid var(--linha);border-radius:10px;padding:9px 11px;font-size:14px;cursor:pointer;font-weight:500;color:var(--tinta)}
+.checks label:has(input:checked){border-color:var(--azul);background:var(--azul-claro)}
+.checks input{accent-color:var(--azul);width:16px;height:16px;flex:none}
+.checks .num{background:var(--azul);color:#fff;border-radius:999px;font-size:11.5px;min-width:24px;text-align:center;padding:1px 6px}
+.checks .num:empty{display:none}
+ol.ordem{list-style:none;margin:0;padding:0;border:1px solid var(--linha);border-radius:10px;overflow:hidden}
+ol.ordem li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid var(--linha);background:#fff}
+ol.ordem li:last-child{border-bottom:0}
+ol.ordem .pos{background:var(--azul-claro);color:var(--azul);font-weight:700;font-size:12.5px;border-radius:7px;padding:3px 8px;min-width:34px;text-align:center}
+ol.ordem .on{flex:1;font-weight:500}
+.seta{border:1px solid var(--linha);background:#fff;border-radius:7px;width:30px;height:28px;font-size:15px;color:var(--azul);line-height:1}
+.seta:hover:not(:disabled){border-color:var(--azul);background:var(--azul-claro)}
+.seta:disabled{opacity:.35;cursor:default}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{display:flex;align-items:center;gap:8px;border:1px solid var(--linha);border-radius:10px;padding:9px 12px;font-size:14px;cursor:pointer;font-weight:500;color:var(--tinta)}
+.radios label:has(input:checked){border-color:var(--azul);background:var(--azul-claro)}
+.radios input{accent-color:var(--azul)}
+.info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.info-grid div{background:var(--fundo);border-radius:10px;padding:9px 12px;min-width:0}
+.info-grid small{display:block;color:var(--cinza);font-size:12px}
+.info-grid b{font-weight:600;word-break:break-word}
+.secao{font-size:13px;font-weight:700;color:var(--tinta);margin:20px 0 6px;padding-top:14px;border-top:1px solid var(--linha)}
+.erro{color:var(--vermelho);font-size:13px;margin-top:8px;min-height:1em}
+.dica{font-size:13px;color:var(--cinza);margin:0 0 12px}
+
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--tinta);color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;z-index:80;box-shadow:0 8px 24px rgba(0,0,0,.2);max-width:90vw}
+
+@media (max-width:900px){ .paineis{grid-template-columns:1fr} }
+@media (max-width:760px){
+  .topo{gap:10px;padding:10px 14px}
+  .topo img{height:34px}
+  main{padding:16px 12px 50px}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .grade{grid-template-columns:1fr}
+  .cartao-cab{grid-template-columns:1fr auto}
+  .cartao-cab .os-tag{grid-column:1/-1;justify-self:start}
+  .form-grid{grid-template-columns:1fr}
+  .info-grid{grid-template-columns:1fr 1fr}
+  .checks{grid-template-columns:1fr 1fr}
+  .busca-hero{padding:22px 18px}
+  .tabela .ocultar-m{display:none}
+}
+</style>
+</head>
+<body>
+<header id="cabecalho" class="hidden">
+  <div class="topo">
+    <img src="icons/logo.png" alt="Grampel Soluções Gráficas">
+    <div class="esp"></div>
+    <nav class="abas hidden" id="abas">
+      <button data-aba="producao">Produção</button>
+      <button data-aba="consulta">Consulta</button>
+      <button data-aba="historico">Histórico</button>
+      <button data-aba="cadastros">Processos de Produção</button>
+      <button data-aba="usuarios">Usuários</button>
+    </nav>
+    <div class="quem"><span id="quem-nome"></span><button id="sair">Sair</button></div>
+  </div>
+</header>
+<main id="app"><div class="aviso"><h2>Carregando…</h2>Conectando ao sistema.</div></main>
+<div id="modal-raiz"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+/* ===================== Configuração ===================== */
+// Usados só enquanto as listas ainda não foram salvas no sistema
+const PADRAO = {
+  maquinas: ['SM 74','SM 52','GTO','Multilith','Impressão digital'],
+  acabamentos: [
+    {k:'corte_final',n:'Corte final'},{k:'vinco',n:'Vinco'},{k:'corte_vinco',n:'Corte e vinco'},
+    {k:'picote',n:'Picote'},{k:'intercalacao',n:'Intercalação'},{k:'blocagem',n:'Blocagem'},
+  ],
+};
+
+/* ===================== Utilidades ===================== */
+const $ = (s,el=document)=>el.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = v => String(v ?? '').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+const loginDe = v => norm(v).replace(/\s+/g,'.').replace(/[^a-z0-9._-]/g,'').slice(0,60);
+const chaveDe = v => norm(v).replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,50) || ('a'+Date.now());
+const fmtData = ts => ts ? new Date(ts).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+const fmtPrazo = d => d ? new Date(d+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+function toast(msg){
+  document.querySelectorAll('.toast').forEach(x=>x.remove());
+  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),2800);
+}
+const ls = {
+  get(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} },
+};
+
+/* ===================== Estado ===================== */
+const S = {
+  eu:null,                 // usuário logado {id, login, nome, admin}
+  temAdmin:null, msgLogin:'',
+  usuarios:[],
+  config:null,             // {maquinas:[], acabamentos:[{k,n}]}
+  servicos:[], carregado:false, lentoAviso:false, erroDb:null,
+  historico:[], histInscrito:false,
+  aba:'consulta',
+  buscaConsulta:'', abertos:new Set(),
+  buscaAdm:'', filtroAdm:'andamento',
+  buscaHist:'',
+  modal:null, modalHist:[],
+  confirmar:null,          // chave de botão aguardando confirmação
+};
+const app = $('#app');
+const listas = () => ({
+  maquinas: (S.config && Array.isArray(S.config.maquinas)) ? S.config.maquinas : PADRAO.maquinas,
+  acabamentos: (S.config && Array.isArray(S.config.acabamentos)) ? S.config.acabamentos : PADRAO.acabamentos,
+});
+
+/* ===================== Fluxo de etapas ===================== */
+function fluxo(s){
+  const sel = Array.isArray(s.acabamentos) ? s.acabamentos : [];
+  const nomes = s.acabNomes || {};
+  const cat = listas().acabamentos;
+  const acabs = sel.map(k=>{ const c = cat.find(a=>a.k===k); return {k, n: c ? c.n : (nomes[k]||k)}; });
+  return acabs;
+}
+function info(s){
+  const f = fluxo(s), et = s.etapas || {};
+  const feitas = f.filter(e=>et[e.k] && et[e.k].feito).length;
+  const finalizado = f.length > 0 && feitas === f.length;
+  const atual = finalizado ? null : (f.find(e=>!(et[e.k] && et[e.k].feito)) || null);
+  const pct = finalizado ? 100 : (f.length ? Math.round(feitas / f.length * 100) : 0);
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const atrasado = !finalizado && !!s.prazo && new Date(s.prazo+'T23:59:59') < hoje;
+  const estado = finalizado ? 'fim' : (feitas===0 ? 'esp' : 'prod');
+  const arquivado = !!s.arquivado;
+  return {f, et, feitas, total:f.length, finalizado, atual, pct, atrasado, estado, arquivado, semEtapas: !f.length};
+}
+function rotuloStatus(i){
+  if (i.semEtapas) return 'Sem etapas definidas';
+  if (i.finalizado) return 'Finalizado';
+  if (i.feitas===0) return 'Aguardando início';
+  return i.atual ? i.atual.n : 'Em produção';
+}
+function selo(i){
+  if (i.atrasado) return `<span class="selo atr"><span class="pt"></span>Atrasado · ${esc(rotuloStatus(i))}</span>`;
+  return `<span class="selo ${i.estado}"><span class="pt"></span>${esc(rotuloStatus(i))}</span>`;
+}
+
+/* ===================== Supabase ===================== */
+const CFG = window.GRAMPEL_CONFIG || {};
+let sb = null;
+const emailDe = login => `${login}@${CFG.EMAIL_DOMINIO || 'grampel.app'}`;
+const ms = v => v ? Date.parse(v) : 0;
+const aviso = (t, m) => `<div class="aviso"><h2>${esc(t)}</h2>${esc(m)}</div>`;
+function deServico(r){
+  return {
+    id:r.id, os:r.os||'', cliente:r.cliente||'', material:r.material||'',
+    quantidade:r.quantidade||'', maquina:r.maquina||'', prazo:r.prazo||'', obs:r.obs||'',
+    acabamentos:Array.isArray(r.acabamentos)?r.acabamentos:[], acabNomes:r.acab_nomes||{}, etapas:r.etapas||{},
+    arquivado:!!r.arquivado, criadoEm:ms(r.criado_em), criadoPorNome:r.criado_por_nome||'',
+    atualizadoEm:ms(r.atualizado_em), atualizadoPorNome:r.atualizado_por_nome||'',
+  };
+}
+function paraServico(d){
+  const mapa = {os:'os', cliente:'cliente', material:'material', quantidade:'quantidade', maquina:'maquina', obs:'obs',
+                acabamentos:'acabamentos', acabNomes:'acab_nomes', etapas:'etapas', arquivado:'arquivado'};
+  const r = {};
+  for (const k in mapa) if (k in d) r[mapa[k]] = d[k];
+  if ('prazo' in d) r.prazo = d.prazo || null;
+  return r;
+}
+const deHist = r => ({id:r.id, em:ms(r.em), usuario:r.usuario||'', acao:r.acao||'', servicoId:r.servico_id, os:r.os||'', cliente:r.cliente||'', material:r.material||''});
+const carimbo = () => ({atualizado_em:new Date().toISOString(), atualizado_por_nome:S.eu.nome});
+async function exec(q){ const {data, error} = await q; if (error) throw error; return data; }
+function traduzirErroAuth(e){
+  const m = (e && e.message) || '';
+  if (/already (been )?registered|already exists/i.test(m)) return 'Já existe um login com esse nome de usuário.';
+  if (/password/i.test(m)) return 'Senha fraca: use pelo menos 6 caracteres.';
+  if (/email/i.test(m) && /invalid/i.test(m)) return 'O Supabase recusou o endereço interno de login. Ajuste EMAIL_DOMINIO no config.js (veja o guia).';
+  if (/signups? not allowed|disabled/i.test(m)) return 'A criação de logins está desativada no Supabase (veja o guia, passo 3).';
+  if (/fetch|network/i.test(m)) return 'Sem conexão com o servidor.';
+  return m || 'Erro desconhecido.';
+}
+
+/* ===================== Inicialização ===================== */
+(async function iniciar(){
+  if (!window.supabase){ app.innerHTML = aviso('Sem conexão', 'Não foi possível carregar o sistema. Verifique a internet e tente novamente.'); return; }
+  if (!CFG.SUPABASE_URL || /COLE_AQUI/.test(CFG.SUPABASE_URL + CFG.SUPABASE_KEY)){
+    app.innerHTML = aviso('Configuração pendente', 'Preencha o endereço e a chave do Supabase no arquivo config.js (veja o guia, passo 4).'); return;
+  }
+  sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_KEY);
+  sb.auth.onAuthStateChange(ev=>{ if (ev==='SIGNED_OUT' && S.eu){ limparSessao(); checarPrimeiroAcesso().then(()=>render()); } });
+  let sessao = null;
+  try { sessao = (await sb.auth.getSession()).data.session; } catch(e){}
+  if (sessao) await entrar(sessao.user); else await checarPrimeiroAcesso();
+  render();
+})();
+
+async function checarPrimeiroAcesso(){
+  S.temAdmin = null;
+  try {
+    const {data, error} = await sb.rpc('existe_admin');
+    if (error){ S.temAdmin = true; S.msgLogin = /existe_admin|schema cache|does not exist/i.test(error.message) ? 'O banco ainda não foi preparado: rode o arquivo schema.sql no Supabase (guia, passo 2).' : S.msgLogin; }
+    else S.temAdmin = !!data;
+  } catch(e){ S.temAdmin = true; }
+}
+async function entrar(user){
+  let perfil = null;
+  try { perfil = await exec(sb.from('perfis').select('*').eq('id', user.id).maybeSingle()); } catch(e){}
+  if (!perfil){
+    try { await sb.auth.signOut(); } catch(e){}
+    S.eu = null; S.msgLogin = 'Este login não tem acesso ao sistema. Fale com um administrador.';
+    await checarPrimeiroAcesso();
+    return false;
+  }
+  S.msgLogin = '';
+  S.eu = {id:perfil.id, login:perfil.login, nome:perfil.nome, admin:!!perfil.admin};
+  S.aba = S.eu.admin ? 'producao' : 'consulta';
+  await carregarTudo();
+  assinarMudancas();
+  return true;
+}
+async function carregarTudo(){
+  await Promise.all([recarregar('servicos'), recarregar('config'), S.eu && S.eu.admin ? recarregar('perfis') : null]);
+}
+async function recarregar(t){
+  if (!S.eu) return;
+  try {
+    if (t==='servicos'){
+      S.servicos = (await exec(sb.from('servicos').select('*').order('criado_em', {ascending:false}))).map(deServico);
+      S.carregado = true; S.erroDb = null;
+    } else if (t==='config'){
+      const c = await exec(sb.from('config').select('*').eq('id', 1).maybeSingle());
+      S.config = c ? {maquinas:c.maquinas, acabamentos:c.acabamentos} : null;
+    } else if (t==='perfis'){
+      if (!S.eu.admin) return;
+      S.usuarios = (await exec(sb.from('perfis').select('*').order('nome'))).map(u=>({id:u.id, login:u.login, nome:u.nome, admin:!!u.admin}));
+      const eu = S.usuarios.find(u=>u.id===S.eu.id);
+      if (!eu) return sair();
+      if (!eu.admin){ S.eu.admin = false; S.aba = 'consulta'; fecharModal(); }
+    } else if (t==='historico'){
+      if (!S.histInscrito) return;
+      S.historico = (await exec(sb.from('historico').select('*').order('em', {ascending:false}).limit(400))).map(deHist);
+    } else if (t==='modalHist'){
+      if (!S.modal || S.modal.tipo!=='ver') return;
+      const id = S.modal.id;
+      const h = (await exec(sb.from('historico').select('*').eq('servico_id', id).order('em', {ascending:false}).limit(100))).map(deHist);
+      if (S.modal && S.modal.id===id) S.modalHist = h;
+    }
+  } catch(e){
+    if (t==='servicos' && !S.carregado) S.erroDb = e;
+  }
+  render();
+}
+let canal = null; const timers = {};
+function agendar(t){ clearTimeout(timers[t]); timers[t] = setTimeout(()=>recarregar(t), 250); }
+function assinarMudancas(){
+  if (canal) return;
+  const ouvir = (tabela, fn) => ['postgres_changes', {event:'*', schema:'public', table:tabela}, fn];
+  canal = sb.channel('grampel-mudancas')
+    .on(...ouvir('servicos', ()=>agendar('servicos')))
+    .on(...ouvir('config', ()=>agendar('config')))
+    .on(...ouvir('perfis', ()=>agendar('perfis')))
+    .on(...ouvir('historico', ()=>{ agendar('historico'); agendar('modalHist'); }))
+    .subscribe();
+}
+// Ao voltar para o app (celular), atualiza tudo
+document.addEventListener('visibilitychange', ()=>{ if (!document.hidden && S.eu) carregarTudo(); });
+
+function limparSessao(){
+  if (canal){ try { sb.removeChannel(canal); } catch(e){} canal = null; }
+  S.eu = null; S.modal = null; S.servicos = []; S.usuarios = []; S.historico = []; S.histInscrito = false;
+  S.carregado = false; S.buscaConsulta = ''; S.buscaAdm = ''; S.config = null;
+}
+async function sair(){
+  const estava = S.eu; limparSessao();
+  if (estava){ try { await sb.auth.signOut(); } catch(e){} }
+  await checarPrimeiroAcesso(); render();
+}
+$('#sair').addEventListener('click', sair);
+$('#abas').addEventListener('click', e=>{
+  const b = e.target.closest('button[data-aba]'); if(!b) return;
+  S.aba = b.dataset.aba; S.confirmar=null; render(true);
+});
+
+/* ===================== Histórico ===================== */
+async function registrar(acao, s){
+  const reg = {acao, usuario:S.eu ? S.eu.nome : ''};
+  if (s){ reg.servico_id = s.id || null; reg.os = s.os || ''; reg.cliente = s.cliente || ''; reg.material = s.material || ''; }
+  try { await sb.from('historico').insert(reg); } catch(e){}
+  agendar('historico'); agendar('modalHist');
+}
+function inscreverHistorico(){
+  if (S.histInscrito) return;
+  S.histInscrito = true; recarregar('historico');
+}
+
+/* ===================== Renderização ===================== */
+function render(focoBusca){
+  const cab = $('#cabecalho');
+  if (S.erroDb){
+    cab.classList.add('hidden');
+    app.innerHTML = `<div class="aviso"><h2>Não foi possível acessar os dados</h2>Recarregue a página em alguns instantes. Se persistir, fale com o responsável pelo sistema.</div>`;
+    return;
+  }
+  if (!S.eu){ cab.classList.add('hidden'); renderLogin(); $('#modal-raiz').innerHTML=''; return; }
+
+  cab.classList.remove('hidden');
+  document.body.style.background = '';
+  $('#quem-nome').textContent = S.eu.nome;
+  const abas = $('#abas');
+  abas.classList.toggle('hidden', !S.eu.admin);
+  abas.querySelectorAll('button').forEach(b=>b.classList.toggle('ativa', b.dataset.aba===S.aba));
+
+  const ativo = document.activeElement;
+  const idFoco = ativo && ativo.id && ativo.id.startsWith('busca-') ? ativo.id : null;
+  const pos = idFoco ? ativo.selectionStart : null;
+
+  let corpo;
+  if (!S.eu.admin || S.aba==='consulta') corpo = telaConsulta();
+  else if (S.aba==='producao') corpo = telaProducao();
+  else if (S.aba==='historico'){ inscreverHistorico(); corpo = telaHistorico(); }
+  else if (S.aba==='cadastros') corpo = telaCadastros();
+  else if (S.aba==='usuarios') corpo = telaUsuarios();
+  else corpo = telaProducao();
+
+  // mantém o que está sendo digitado nos campos de cadastro
+  const rascunhos = {};
+  app.querySelectorAll('[data-rascunho]').forEach(el=>{ rascunhos[el.dataset.rascunho] = el.type==='radio' ? (el.checked?el.value:rascunhos[el.dataset.rascunho]) : el.value; });
+
+  app.innerHTML = (S.lentoAviso ? `<div class="faixa">A conexão está lenta — os dados podem ainda não estar atualizados.</div>` : '') + corpo;
+
+  app.querySelectorAll('[data-rascunho]').forEach(el=>{
+    const v = rascunhos[el.dataset.rascunho]; if (v===undefined) return;
+    if (el.type==='radio') el.checked = (el.value===v); else el.value = v;
+  });
+  if (idFoco){ const el=$('#'+idFoco); if(el){ el.focus(); try{el.setSelectionRange(pos,pos);}catch(e){} } }
+  else if (focoBusca){ const el=$('#busca-consulta')||$('#busca-adm'); if(el) el.focus(); }
+  renderModal();
+}
+
+/* ---------- Login ---------- */
+function renderLogin(){
+  const modo = S.temAdmin===null ? 'carregando' : (S.temAdmin ? 'login' : 'primeiro');
+  const chave = modo + '|' + (S.msgLogin||'');
+  if (app.querySelector('.tela-login') && app.dataset.login === chave) return;
+  app.dataset.login = chave;
+  app.style.maxWidth='none'; app.style.padding='0';
+  const logo = `<img src="icons/logo.png" alt="Grampel Soluções Gráficas">`;
+  const msg = S.msgLogin ? `<div class="faixa" style="margin:0 0 14px">${esc(S.msgLogin)}</div>` : '';
+  let form;
+  if (modo==='carregando'){
+    form = `<form onsubmit="return false"><h2>Carregando…</h2><p>Conectando ao sistema.</p></form>`;
+  } else if (modo==='primeiro'){
+    form = `<form id="form-primeiro" novalidate>
+      <h2>Primeiro acesso</h2>
+      <p>Crie o primeiro usuário administrador do sistema.</p>${msg}
+      <label class="campo">Nome de usuário<input name="nome" autocomplete="username" required></label>
+      <label class="campo">Senha (mínimo 6 caracteres)<input name="senha" type="password" autocomplete="new-password" required></label>
+      <label class="campo">Repita a senha<input name="senha2" type="password" autocomplete="new-password" required></label>
+      <div class="erro" id="login-erro"></div>
+      <button class="btn btn-pri" type="submit">Criar administrador e entrar</button>
+    </form>`;
+  } else {
+    form = `<form id="form-login" novalidate>
+      <h2>Entrar</h2>
+      <p>Acompanhamento de serviços</p>${msg}
+      <label class="campo">Usuário<input name="nome" autocomplete="username" required></label>
+      <label class="campo">Senha<input name="senha" type="password" autocomplete="current-password" required></label>
+      <div class="erro" id="login-erro"></div>
+      <button class="btn btn-pri" type="submit">Entrar</button>
+    </form>`;
+  }
+  app.innerHTML = `<div class="tela-login"><div class="caixa-login">${logo}${form}</div></div>`;
+  const primeiro = app.querySelector('input'); if (primeiro) primeiro.focus();
+}
+async function fazerLogin(form){
+  const login = loginDe(form.nome.value), senha = form.senha.value, erro = $('#login-erro');
+  const btn = form.querySelector('button'); erro.textContent='';
+  if (!login || !senha){ erro.textContent = 'Informe usuário e senha.'; return; }
+  btn.disabled = true;
+  const {data, error} = await sb.auth.signInWithPassword({email:emailDe(login), password:senha});
+  if (error){
+    btn.disabled = false;
+    erro.textContent = /fetch|network/i.test(error.message) ? 'Sem conexão com o servidor.' : 'Usuário ou senha incorretos.';
+    return;
+  }
+  await entrar(data.user);
+  render(true);
+}
+async function criarPrimeiro(form){
+  const erro = $('#login-erro');
+  const nome = form.nome.value.trim(), senha = form.senha.value, login = loginDe(nome);
+  if (!login) { erro.textContent='Informe um nome de usuário.'; return; }
+  if (senha.length < 6) { erro.textContent='A senha precisa ter pelo menos 6 caracteres.'; return; }
+  if (senha !== form.senha2.value) { erro.textContent='As senhas não conferem.'; return; }
+  const btn = form.querySelector('button'); btn.disabled = true;
+  const {data, error} = await sb.auth.signUp({email:emailDe(login), password:senha});
+  if (error){ btn.disabled=false; erro.textContent = traduzirErroAuth(error); return; }
+  if (!data.session){ btn.disabled=false; erro.textContent = 'O Supabase está exigindo confirmação de e-mail. Desative "Confirm email" (guia, passo 3) e tente de novo.'; return; }
+  try { await exec(sb.from('perfis').insert({id:data.user.id, login, nome, admin:true})); }
+  catch(e){
+    try { await sb.auth.signOut(); } catch(_){}
+    btn.disabled=false; erro.textContent = 'Não foi possível criar o administrador. Talvez outro administrador já tenha sido criado — recarregue a página.';
+    return;
+  }
+  await entrar(data.user);
+  registrar(`Criou o primeiro administrador: ${nome}`);
+  render(true);
+}
+
+/* ---------- Linha do tempo ---------- */
+function linhaDoTempo(s, editavel){
+  const i = info(s);
+  let html = '<ul class="tl">', grupo = null;
+  i.f.forEach(e=>{
+    if (!grupo){ grupo = true; html += `<li class="tl-grupo">Etapas do material</li>`; }
+    const r = i.et[e.k] || {};
+    const cls = r.feito ? 'feito' : (i.atual && i.atual.k===e.k ? 'atual' : 'pend');
+    const quando = r.feito ? `Concluído em ${fmtData(r.em)}${r.porNome?' · '+esc(r.porNome):''}`
+                 : (cls==='atual' ? (i.feitas===0 ? 'Próxima etapa' : 'Em andamento') : '');
+    const miolo = `<span class="marca">${r.feito?'✓':''}</span><span><div class="nome">${esc(e.n)}</div>${quando?`<div class="quando">${quando}</div>`:''}</span>`;
+    html += editavel
+      ? `<li class="${cls}"><button class="toggle" data-toggle="${esc(e.k)}" data-id="${esc(s.id)}" title="${r.feito?'Desmarcar':'Marcar como concluída'}">${miolo}</button></li>`
+      : `<li class="${cls}">${miolo}</li>`;
+  });
+  return html + '</ul>';
+}
+
+/* ---------- Consulta ---------- */
+function telaConsulta(){
+  app.style.maxWidth=''; app.style.padding='';
+  const q = norm(S.buscaConsulta);
+  let corpo = '';
+  if (!S.carregado) corpo = `<div class="vazio">Carregando serviços…</div>`;
+  else if (!q) corpo = `<div class="vazio">Digite o número da O.S. ou o nome do cliente para ver o andamento dos materiais.</div>`;
+  else {
+    const achados = S.servicos.filter(s => norm(s.os).includes(q) || norm(s.cliente).includes(q) || norm(s.material).includes(q));
+    if (!achados.length) corpo = `<div class="vazio">Nenhum serviço encontrado para “${esc(S.buscaConsulta)}”.</div>`;
+    else {
+      const grupos = new Map();
+      achados.sort((a,b)=>(b.criadoEm||0)-(a.criadoEm||0)).forEach(s=>{
+        const k = norm(s.cliente); if(!grupos.has(k)) grupos.set(k,{nome:s.cliente,itens:[]});
+        grupos.get(k).itens.push(s);
+      });
+      const unico = achados.length === 1;
+      corpo = [...grupos.values()].map(g=>`
+        <section class="grupo-cli">
+          <h3><b>${esc(g.nome)}</b> · ${g.itens.length} ${g.itens.length>1?'materiais':'material'}</h3>
+          <div class="lista">${g.itens.map(s=>cartaoConsulta(s, unico)).join('')}</div>
+        </section>`).join('');
+    }
+  }
+  return `
+    <div class="busca-hero">
+      <h1>Onde está o serviço?</h1>
+      <p>Pesquise pela O.S. ou pelo nome do cliente e escolha o material.</p>
+      <div class="campo-busca">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="busca-consulta" type="search" autocomplete="off" placeholder="Ex.: 1520 ou Padaria Central" value="${esc(S.buscaConsulta)}">
+      </div>
+    </div>${corpo}`;
+}
+function cartaoConsulta(s, abertoForcado){
+  const i = info(s);
+  const aberto = abertoForcado || S.abertos.has(s.id);
+  const sub = [s.quantidade, s.maquina, s.prazo?`Prazo ${fmtPrazo(s.prazo)}`:''].filter(Boolean).map(esc).join(' · ');
+  return `
+  <article class="cartao">
+    <button class="cartao-cab" data-expandir="${esc(s.id)}" aria-expanded="${aberto}">
+      <span class="os-tag">O.S. ${esc(s.os)}</span>
+      <span>
+        <div class="mat-nome">${esc(s.material)}</div>
+        <div class="mat-sub">${sub}</div>
+        <div class="barra ${i.finalizado?'ok':''}" style="max-width:420px"><i style="width:${i.pct}%"></i></div>
+      </span>
+      <span class="dir">${selo(i)}<span class="mat-sub">${i.feitas}/${i.total} etapas</span></span>
+    </button>
+    ${aberto ? `<div class="detalhe">${linhaDoTempo(s,false)}${s.obs?`<div class="obs">${esc(s.obs)}</div>`:''}</div>` : ''}
+  </article>`;
+}
+
+/* ---------- Produção ---------- */
+const ICONE_PASTA = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h3.6c.6 0 1.2.25 1.6.7L12 6h6.5A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5v-11Z"/></svg>`;
+function telaProducao(){
+  app.style.maxWidth=''; app.style.padding='';
+  const todos = S.servicos.map(s=>({s, i:info(s)})).filter(x=>!x.i.arquivado);
+  const k = {
+    andamento: todos.filter(x=>!x.i.finalizado).length,
+    esp: todos.filter(x=>!x.i.finalizado && x.i.feitas===0).length,
+    atrasados: todos.filter(x=>x.i.atrasado).length,
+    fim: todos.filter(x=>x.i.finalizado).length,
+  };
+  const q = norm(S.buscaAdm);
+  const filtrados = todos.filter(x=>{
+    if (S.filtroAdm==='andamento' && x.i.finalizado) return false;
+    if (S.filtroAdm==='finalizados' && !x.i.finalizado) return false;
+    if (!q) return true;
+    return norm(x.s.os).includes(q) || norm(x.s.cliente).includes(q) || norm(x.s.material).includes(q);
+  });
+  const grupos = new Map();
+  filtrados.forEach(x=>{
+    const ch = norm(x.s.cliente);
+    if (!grupos.has(ch)) grupos.set(ch, {nome:x.s.cliente, itens:[]});
+    grupos.get(ch).itens.push(x);
+  });
+  const recente = x => x.s.atualizadoEm || x.s.criadoEm || 0;
+  const lista = [...grupos.values()].map(g=>{
+    g.itens.sort((a,b)=> (a.i.atrasado!==b.i.atrasado ? (a.i.atrasado?-1:1) : recente(b)-recente(a)));
+    g.atrasado = g.itens.some(x=>x.i.atrasado);
+    g.recente = Math.max(...g.itens.map(recente));
+    return g;
+  }).sort((a,b)=> a.atrasado!==b.atrasado ? (a.atrasado?-1:1) : b.recente-a.recente);
+
+  const conteudo = !S.carregado ? `<div class="vazio">Carregando serviços…</div>`
+    : !todos.length ? `<div class="vazio">Nenhum trabalho cadastrado ainda. Use o botão “+ Novo trabalho” acima.</div>`
+    : !lista.length ? `<div class="vazio">Nenhum trabalho neste filtro.</div>`
+    : `<div class="grade">${lista.map(quadroCliente).join('')}</div>`;
+
+  return `
+    <div class="kpis">
+      <div class="kpi"><div class="v">${k.andamento}</div><div class="r">Em produção</div></div>
+      <div class="kpi"><div class="v">${k.esp}</div><div class="r">Aguardando início</div></div>
+      <div class="kpi vermelho"><div class="v">${k.atrasados}</div><div class="r">Atrasados</div></div>
+      <div class="kpi verde"><div class="v">${k.fim}</div><div class="r" style="display:flex;justify-content:space-between;align-items:center;gap:8px">Finalizados
+        ${k.fim ? `<button class="btn btn-sec btn-peq" data-zerar title="Tira os finalizados da contagem e do painel de produção">${S.confirmar==='zerar'?'Confirmar':'Zerar'}</button>` : ''}</div></div>
+    </div>
+    <div class="barra-ferr">
+      <input id="busca-adm" class="busca-peq" type="search" autocomplete="off" placeholder="Filtrar por O.S., cliente ou material" value="${esc(S.buscaAdm)}">
+      <div class="chips">
+        <button data-filtro="andamento" class="${S.filtroAdm==='andamento'?'ativa':''}">Em produção</button>
+        <button data-filtro="finalizados" class="${S.filtroAdm==='finalizados'?'ativa':''}">Finalizados</button>
+        <button data-filtro="todos" class="${S.filtroAdm==='todos'?'ativa':''}">Todos</button>
+      </div>
+      <button class="btn btn-pri" data-acao="novo">+ Novo trabalho</button>
+    </div>
+    ${conteudo}`;
+}
+function quadroCliente(g){
+  const pasta = g.itens.length > 1;
+  const primeiro = g.itens[0].s;
+  return `
+  <section class="quadro ${pasta?'pasta':''}">
+    <div class="quadro-cab">
+      ${pasta ? ICONE_PASTA : ''}
+      <span class="cli" title="${esc(g.nome)}">${esc(g.nome)}</span>
+      ${pasta ? `<span class="contagem">${g.itens.length} materiais</span>` : ''}
+      <button class="mais" data-novo-cliente="${esc(primeiro.id)}" title="Adicionar outro material para este cliente">+</button>
+    </div>
+    <div class="itens">${g.itens.map(({s,i})=>`
+      <div class="item" data-ver="${esc(s.id)}" tabindex="0" role="button">
+        <div class="item-l1"><span class="os-tag">O.S. ${esc(s.os)}</span><span class="mat-nome">${esc(s.material)}</span></div>
+        <div class="item-l2">${[s.quantidade, s.maquina, s.prazo?'Prazo '+fmtPrazo(s.prazo):''].filter(Boolean).map(esc).join(' · ')}</div>
+        <div class="item-l3">
+          ${selo(i)}
+          <div class="barra ${i.finalizado?'ok':''}"><i style="width:${i.pct}%"></i></div>
+          ${i.finalizado ? '' : `<button class="ok-redondo" data-avancar="${esc(s.id)}" title="Concluir: ${esc(i.atual?i.atual.n:'')}">✓ Concluir</button>`}
+        </div>
+      </div>`).join('')}
+    </div>
+  </section>`;
+}
+
+/* ---------- Histórico ---------- */
+function telaHistorico(){
+  app.style.maxWidth=''; app.style.padding='';
+  const q = norm(S.buscaHist);
+  const regs = S.historico.filter(h=>!q || norm([h.usuario,h.os,h.cliente,h.material,h.acao].join(' ')).includes(q));
+  return `
+  <div class="painel">
+    <h2>Histórico de alterações</h2>
+    <p class="dica">Tudo o que é feito no sistema fica registrado aqui, com o nome de quem fez. Mostrando as últimas 400 alterações.</p>
+    <div class="barra-ferr" style="margin-bottom:10px"><input id="busca-hist" class="busca-peq" type="search" placeholder="Filtrar por usuário, O.S., cliente ou ação" value="${esc(S.buscaHist)}"></div>
+    ${!regs.length ? `<div class="vazio">${S.historico.length?'Nada encontrado.':'Nenhuma alteração registrada ainda.'}</div>` : `
+    <table class="tabela">
+      <thead><tr><th>Data e hora</th><th>Usuário</th><th class="ocultar-m">O.S. / Cliente</th><th>Alteração</th></tr></thead>
+      <tbody>${regs.map(h=>`<tr>
+        <td style="white-space:nowrap">${fmtData(h.em)}</td>
+        <td><b>${esc(h.usuario||'—')}</b></td>
+        <td class="ocultar-m">${h.os?`O.S. ${esc(h.os)}<br>`:''}<span class="mat-sub">${esc([h.cliente,h.material].filter(Boolean).join(' · '))}</span></td>
+        <td>${esc(h.acao)}</td></tr>`).join('')}
+      </tbody>
+    </table>`}
+  </div>`;
+}
+
+/* ---------- Impressoras e acabamentos ---------- */
+function telaCadastros(){
+  app.style.maxWidth=''; app.style.padding='';
+  const L = listas();
+  return `
+  <div class="paineis">
+    <div class="painel">
+      <h2>Impressoras</h2>
+      <p class="dica">Máquinas que aparecem para escolha ao cadastrar um trabalho.</p>
+      <form class="add-linha" data-form-add="maquina"><input data-rascunho="nova-maquina" name="valor" placeholder="Nome da impressora" autocomplete="off"><button class="btn btn-pri" type="submit">Adicionar</button></form>
+      <ul class="itens-cad">${L.maquinas.map((m,ix)=>`<li><span>${esc(m)}</span>
+        <button class="x ${S.confirmar==='maq:'+ix?'conf':''}" data-rem-maq="${ix}">${S.confirmar==='maq:'+ix?'Confirmar':'Remover'}</button></li>`).join('') || '<li><span class="mat-sub">Nenhuma impressora cadastrada.</span></li>'}</ul>
+    </div>
+    <div class="painel">
+      <h2>Processos de Produção e Acabamentos</h2>
+      <p class="dica">Etapas que podem ser marcadas em cada material, em ordem alfabética.</p>
+      <form class="add-linha" data-form-add="acabamento"><input data-rascunho="novo-acab" name="valor" placeholder="Nome do processo ou acabamento" autocomplete="off"><button class="btn btn-pri" type="submit">Adicionar</button></form>
+      <ul class="itens-cad">${L.acabamentos.map((a,ix)=>({a,ix})).sort((x,y)=>x.a.n.localeCompare(y.a.n,'pt-BR',{sensitivity:'base'})).map(({a,ix})=>`<li><span>${esc(a.n)}</span>
+        <button class="x ${S.confirmar==='acab:'+ix?'conf':''}" data-rem-acab="${ix}">${S.confirmar==='acab:'+ix?'Confirmar':'Remover'}</button></li>`).join('') || '<li><span class="mat-sub">Nenhum processo cadastrado.</span></li>'}</ul>
+    </div>
+  </div>`;
+}
+
+/* ---------- Usuários ---------- */
+function telaUsuarios(){
+  app.style.maxWidth=''; app.style.padding='';
+  const us = [...S.usuarios].sort((a,b)=> (b.admin-a.admin) || norm(a.nome).localeCompare(norm(b.nome)));
+  return `
+  <div class="paineis">
+    <div class="painel">
+      <h2>Usuários cadastrados</h2>
+      <p class="dica">Administradores cadastram e alteram trabalhos. Quem só acompanha vê apenas a tela de consulta.</p>
+      <table class="tabela"><thead><tr><th>Usuário</th><th>Tipo</th><th></th></tr></thead><tbody>
+      ${us.map(u=>`<tr>
+        <td><b>${esc(u.nome)}</b>${u.id===S.eu.id?' <span class="mat-sub">(você)</span>':''}</td>
+        <td><span class="tag-tipo ${u.admin?'adm':'acomp'}">${u.admin?'Administrador':'Acompanhar status'}</span></td>
+        <td style="text-align:right;white-space:nowrap"><button class="btn btn-sec btn-peq" data-editar-usuario="${esc(u.id)}">Editar</button></td>
+      </tr>`).join('')}
+      </tbody></table>
+    </div>
+    <div class="painel">
+      <h2>Novo usuário</h2>
+      <p class="dica">O nome de usuário é usado para entrar no sistema e aparece no histórico.</p>
+      <form id="form-usuario" novalidate>
+        <label class="campo" style="margin-bottom:12px">Nome de usuário<input data-rascunho="u-nome" name="nome" autocomplete="off" placeholder="Ex.: Carlos"></label>
+        <label class="campo" style="margin-bottom:12px">Senha<input data-rascunho="u-senha" name="senha" type="password" autocomplete="new-password"></label>
+        <div class="rotulo">Tipo de acesso</div>
+        <div class="radios" style="margin-bottom:12px">
+          <label><input type="radio" data-rascunho="u-tipo" name="tipo" value="acomp" checked> Apenas acompanhar status</label>
+          <label><input type="radio" data-rascunho="u-tipo" name="tipo" value="admin"> Administrador</label>
+        </div>
+        <div class="erro" id="usuario-erro"></div>
+        <button class="btn btn-pri" type="submit">Cadastrar usuário</button>
+      </form>
+    </div>
+  </div>`;
+}
+
+/* ---------- Modais ---------- */
+function renderModal(){
+  const raiz = $('#modal-raiz');
+  if (!S.modal || !S.eu){ raiz.innerHTML=''; raiz.dataset.form=''; return; }
+  const m = S.modal;
+  if (m.tipo==='ver'){
+    const s = S.servicos.find(x=>x.id===m.id);
+    if (!s){ fecharModal(); return; }
+    const i = info(s);
+    const hist = S.modalHist.slice().sort((a,b)=>(b.em||0)-(a.em||0));
+    const scroll = raiz.querySelector('.fundo-modal') ? raiz.querySelector('.fundo-modal').scrollTop : 0;
+    raiz.innerHTML = `
+    <div class="fundo-modal" data-fundo>
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-cab"><span class="os-tag">O.S. ${esc(s.os)}</span><h2>${esc(s.material)}</h2><button class="fechar" data-fechar aria-label="Fechar">×</button></div>
+        <div class="modal-corpo">
+          <div class="info-grid">
+            <div><small>Cliente</small><b>${esc(s.cliente)}</b></div>
+            <div><small>Quantidade</small><b>${esc(s.quantidade||'—')}</b></div>
+            <div><small>Impressora</small><b>${esc(s.maquina||'—')}</b></div>
+            <div><small>Prazo</small><b>${fmtPrazo(s.prazo)}</b></div>
+          </div>
+          <div style="margin-bottom:14px">${selo(i)}</div>
+          <p class="dica">Clique em uma etapa para marcá-la como concluída (ou desmarcar).</p>
+          ${linhaDoTempo(s,true)}
+          ${s.obs?`<div class="obs">${esc(s.obs)}</div>`:''}
+          <div class="secao">Histórico deste material</div>
+          ${hist.length ? `<ul class="hist-lista">${hist.map(h=>`<li><b>${esc(h.usuario||'—')}</b> — ${esc(h.acao)}<div class="h-meta">${fmtData(h.em)}</div></li>`).join('')}</ul>` : `<p class="dica">Nenhuma alteração registrada.</p>`}
+        </div>
+        <div class="modal-rod">
+          <button class="btn btn-perigo ${S.confirmar==='excluir'?'conf':''}" data-excluir="${esc(s.id)}">${S.confirmar==='excluir'?'Confirmar exclusão':'Excluir'}</button>
+          <span style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-sec" data-editar="${esc(s.id)}">Editar dados</button>
+            ${i.finalizado?'':`<button class="btn btn-ok" data-avancar="${esc(s.id)}">✓ Concluir ${esc(i.atual?i.atual.n:'')}</button>`}
+          </span>
+        </div>
+      </div>
+    </div>`;
+    raiz.dataset.form='';
+    if (scroll) raiz.querySelector('.fundo-modal').scrollTop = scroll;
+    return;
+  }
+  const chave = m.tipo+':'+(m.id||'')+':'+(m.base||'');
+  if (raiz.dataset.form === chave) return;     // não remonta formulário em uso
+  raiz.dataset.form = chave;
+  if (m.tipo==='usuario'){ raiz.innerHTML = modalUsuario(m.id); return; }
+
+  const s = m.tipo==='editar' ? (S.servicos.find(x=>x.id===m.id) || {}) : (m.base ? (()=>{ const b=S.servicos.find(x=>x.id===m.base)||{}; return {cliente:b.cliente, os:b.os, prazo:b.prazo}; })() : {});
+  const sel = s.acabamentos || [];
+  const L = listas();
+  const maqs = [...L.maquinas]; if (s.maquina && !maqs.includes(s.maquina)) maqs.push(s.maquina);
+  const acabs = [...L.acabamentos, ...sel.filter(k=>!L.acabamentos.some(a=>a.k===k)).map(k=>({k, n:(s.acabNomes||{})[k]||k}))]
+    .sort((x,y)=>String(x.n).localeCompare(String(y.n),'pt-BR',{sensitivity:'base'}));
+  raiz.innerHTML = `
+  <div class="fundo-modal" data-fundo>
+    <form class="modal" id="form-servico" role="dialog" aria-modal="true" novalidate>
+      <div class="modal-cab"><h2>${m.tipo==='editar'?'Editar trabalho':'Novo trabalho'}</h2><button type="button" class="fechar" data-fechar aria-label="Fechar">×</button></div>
+      <div class="modal-corpo">
+        <div class="form-grid">
+          <label class="campo full">Cliente *<input name="cliente" value="${esc(s.cliente||'')}" placeholder="Ex.: Padaria Central" list="lista-clientes" autocomplete="off"></label>
+          <label class="campo">Material *<input name="material" value="${esc(s.material||'')}" placeholder="Ex.: Cartão de visita"></label>
+          <label class="campo">Quantidade<input name="quantidade" value="${esc(s.quantidade||'')}" placeholder="Ex.: 1.000 un."></label>
+          <label class="campo">Impressora
+            <select name="maquina"><option value="">Selecione…</option>${maqs.map(q=>`<option ${q===s.maquina?'selected':''}>${esc(q)}</option>`).join('')}</select>
+          </label>
+          <label class="campo">Nº da O.S. *<input name="os" value="${esc(s.os||'')}" placeholder="Ex.: 1520"></label>
+          <label class="campo">Prazo de entrega<input name="prazo" type="date" value="${esc(s.prazo||'')}"></label>
+          <div class="full">
+            <div class="rotulo">Etapas do material <span style="font-weight:400">— marque na ordem em que serão feitas</span></div>
+            <div class="checks" id="acab-checks">${acabs.map(a=>`<label><input type="checkbox" name="acab" value="${esc(a.k)}" data-nome="${esc(a.n)}" ${sel.includes(a.k)?'checked':''}><span style="flex:1">${esc(a.n)}</span><b class="num" data-num="${esc(a.k)}"></b></label>`).join('') || '<span class="mat-sub">Nenhum acabamento cadastrado.</span>'}</div>
+            <div id="acab-ordem-box" style="margin-top:12px"></div>
+          </div>
+          <label class="campo full">Observações<textarea name="obs" rows="3" placeholder="Informações para os vendedores (opcional)">${esc(s.obs||'')}</textarea></label>
+        </div>
+        <datalist id="lista-clientes">${[...new Set(S.servicos.map(x=>x.cliente).filter(Boolean))].sort().map(c=>`<option value="${esc(c)}">`).join('')}</datalist>
+        <div class="erro" id="form-erro"></div>
+      </div>
+      <div class="modal-rod">
+        <span></span>
+        <span style="display:flex;gap:8px">
+          <button type="button" class="btn btn-sec" data-fechar>Cancelar</button>
+          <button type="submit" class="btn btn-pri" id="btn-salvar">${m.tipo==='editar'?'Salvar alterações':'Cadastrar'}</button>
+        </span>
+      </div>
+    </form>
+  </div>`;
+  S.formOrdem = sel.filter(k=>acabs.some(a=>a.k===k));
+  desenharOrdem();
+  setTimeout(()=>{ const el = s.cliente ? $('#form-servico [name=material]') : $('#form-servico [name=cliente]'); if(el) el.focus(); },0);
+}
+function desenharOrdem(){
+  const box = $('#acab-ordem-box'); if(!box) return;
+  const nomeK = k => { const el = document.querySelector(`#acab-checks input[value="${CSS.escape(k)}"]`); return el ? el.dataset.nome : k; };
+  document.querySelectorAll('#acab-checks [data-num]').forEach(b=>{
+    const ix = S.formOrdem.indexOf(b.dataset.num); b.textContent = ix>=0 ? (ix+1)+'º' : '';
+  });
+  if (!S.formOrdem.length){ box.innerHTML=''; return; }
+  box.innerHTML = `<div class="rotulo">Sequência das etapas</div><ol class="ordem">${S.formOrdem.map((k,ix)=>`
+    <li><span class="pos">${ix+1}º</span><span class="on">${esc(nomeK(k))}</span>
+      <button type="button" class="seta" data-mover="${ix}" data-dir="-1" ${ix===0?'disabled':''} title="Subir">↑</button>
+      <button type="button" class="seta" data-mover="${ix}" data-dir="1" ${ix===S.formOrdem.length-1?'disabled':''} title="Descer">↓</button></li>`).join('')}</ol>`;
+}
+function modalUsuario(id){
+  const u = S.usuarios.find(x=>x.id===id); if(!u) return '';
+  const souEu = u.id===S.eu.id;
+  return `
+  <div class="fundo-modal" data-fundo>
+    <form class="modal" id="form-editar-usuario" data-id="${esc(u.id)}" role="dialog" aria-modal="true" novalidate style="max-width:460px">
+      <div class="modal-cab"><h2>${esc(u.nome)}</h2><button type="button" class="fechar" data-fechar aria-label="Fechar">×</button></div>
+      <div class="modal-corpo">
+        <div class="rotulo">Tipo de acesso</div>
+        <div class="radios" style="margin-bottom:14px">
+          <label><input type="radio" name="tipo" value="acomp" ${!u.admin?'checked':''} ${souEu?'disabled':''}> Apenas acompanhar status</label>
+          <label><input type="radio" name="tipo" value="admin" ${u.admin?'checked':''} ${souEu?'disabled':''}> Administrador</label>
+        </div>
+        ${souEu?'<p class="dica">Você não pode mudar o seu próprio tipo de acesso.</p>':''}
+        <label class="campo">Nova senha (deixe em branco para manter)<input name="senha" type="password" autocomplete="new-password"></label>
+        <div class="erro" id="eu-erro"></div>
+      </div>
+      <div class="modal-rod">
+        ${souEu?'<span></span>':`<button type="button" class="btn btn-perigo ${S.confirmar==='rem-user'?'conf':''}" data-remover-usuario="${esc(u.id)}">${S.confirmar==='rem-user'?'Confirmar remoção':'Remover usuário'}</button>`}
+        <span style="display:flex;gap:8px"><button type="button" class="btn btn-sec" data-fechar>Cancelar</button><button type="submit" class="btn btn-pri">Salvar</button></span>
+      </div>
+    </form>
+  </div>`;
+}
+function abrirModal(m){
+  S.modalHist=[]; S.confirmar=null;
+  $('#modal-raiz').dataset.form=''; S.modal=m;
+  if (m.tipo==='ver') recarregar('modalHist');
+  renderModal();
+}
+function fecharModal(){
+  S.modal=null; S.confirmar=null; S.modalHist=[]; $('#modal-raiz').dataset.form=''; renderModal();
+}
+
+/* ===================== Escrita ===================== */
+function erroGravar(e){
+  const m = (e && e.message) || '';
+  if (/row-level security|permiss|Sem permiss|42501/i.test(m + (e && e.code))) toast('Você não tem permissão para esta alteração.');
+  else if (/fetch|network|Failed/i.test(m)) toast('Sem conexão. Verifique a internet e tente novamente.');
+  else toast('Não foi possível salvar. ' + m);
+}
+// Atualiza um trabalho e confirma que o banco aceitou
+async function alterarServico(id, campos){
+  const r = await exec(sb.from('servicos').update(campos).eq('id', id).select('id'));
+  if (!r || !r.length) throw new Error('Sem permissão');
+  agendar('servicos');
+}
+const gravando = new Set();
+async function marcarEtapa(id, k, feito){
+  if (!S.eu || !S.eu.admin || gravando.has(id)) return false;
+  const s = S.servicos.find(x=>x.id===id); if(!s) return false;
+  const etapa = info(s).f.find(e=>e.k===k);
+  const etapas = {...(s.etapas||{}), [k]: feito ? {feito:true, em:Date.now(), porNome:S.eu.nome} : {feito:false, em:null, porNome:null}};
+  const campos = {etapas, ...carimbo()};
+  if (!feito && s.arquivado) campos.arquivado = false;
+  gravando.add(id);
+  // mostra na hora; o banco confirma em seguida
+  const anterior = {etapas:s.etapas, arquivado:s.arquivado, atualizadoEm:s.atualizadoEm, atualizadoPorNome:s.atualizadoPorNome};
+  Object.assign(s, {etapas, atualizadoEm:Date.now(), atualizadoPorNome:S.eu.nome}); if ('arquivado' in campos) s.arquivado = false;
+  render();
+  try {
+    await alterarServico(id, campos);
+    registrar(`${feito?'Concluiu':'Desmarcou'} a etapa: ${etapa?etapa.n:k}`, s);
+    return true;
+  } catch(e){ Object.assign(s, anterior); render(); erroGravar(e); return false; }
+  finally { gravando.delete(id); }
+}
+async function avancar(id){
+  const s = S.servicos.find(x=>x.id===id); if(!s) return;
+  const i = info(s); if(!i.atual) return;
+  const nome = i.atual.n;
+  if (await marcarEtapa(id, i.atual.k, true)) toast(`${nome} concluída · O.S. ${s.os}`);
+}
+const ROTULOS = {cliente:'Cliente', material:'Material', quantidade:'Quantidade', maquina:'Impressora', os:'O.S.', prazo:'Prazo', obs:'Observações'};
+async function salvarForm(form){
+  const fd = new FormData(form);
+  const marcados = [...form.querySelectorAll('input[name=acab]:checked')];
+  const dados = {
+    cliente: String(fd.get('cliente')||'').trim(),
+    material: String(fd.get('material')||'').trim(),
+    quantidade: String(fd.get('quantidade')||'').trim(),
+    maquina: String(fd.get('maquina')||''),
+    os: String(fd.get('os')||'').trim(),
+    prazo: String(fd.get('prazo')||''),
+    obs: String(fd.get('obs')||'').trim(),
+    acabamentos: S.formOrdem.filter(k=>marcados.some(x=>x.value===k)).concat(marcados.map(x=>x.value).filter(k=>!S.formOrdem.includes(k))),
+    acabNomes: Object.fromEntries(marcados.map(x=>[x.value, x.dataset.nome])),
+  };
+  if (!dados.cliente || !dados.material || !dados.os){ $('#form-erro').textContent = 'Preencha cliente, material e nº da O.S.'; return; }
+  if (!dados.acabamentos.length){ $('#form-erro').textContent = 'Marque pelo menos uma etapa do material.'; return; }
+  const btn = $('#btn-salvar'); btn.disabled = true;
+  try {
+    if (S.modal.tipo!=='editar'){
+      const novo = await exec(sb.from('servicos').insert({...paraServico(dados), etapas:{}, criado_por_nome:S.eu.nome, atualizado_por_nome:S.eu.nome}).select('id').single());
+      registrar('Cadastrou o trabalho', {id:novo.id, ...dados});
+      agendar('servicos');
+      toast('Trabalho cadastrado.');
+      fecharModal();
+    } else {
+      const id = S.modal.id, antes = S.servicos.find(x=>x.id===id) || {};
+      const mud = Object.keys(ROTULOS).filter(c=>(antes[c]||'')!==(dados[c]||''))
+        .map(c=> c==='obs' ? 'Observações alteradas' : `${ROTULOS[c]}: “${antes[c]||'—'}” → “${dados[c]||'—'}”`);
+      const nomesAcab = l => (l||[]).map((k,i)=>(i+1)+'º '+(dados.acabNomes[k]||(antes.acabNomes||{})[k]||k)).join(', ') || 'nenhum';
+      if ((antes.acabamentos||[]).join()!==dados.acabamentos.join()) mud.push(`Etapas do material (sequência): ${nomesAcab(antes.acabamentos)} → ${nomesAcab(dados.acabamentos)}`);
+      const aindaFinal = info({...antes, ...dados}).finalizado;
+      await alterarServico(id, {...paraServico(dados), ...carimbo(), ...(antes.arquivado && !aindaFinal ? {arquivado:false} : {})});
+      Object.assign(antes, dados);
+      if (mud.length) registrar('Editou dados — ' + mud.join('; '), {id, ...dados});
+      toast('Alterações salvas.');
+      abrirModal({tipo:'ver', id});
+    }
+  } catch(e){ btn.disabled = false; erroGravar(e); }
+}
+async function zerarFinalizados(){
+  S.confirmar = null;
+  const ids = S.servicos.filter(s=>{ const i=info(s); return i.finalizado && !i.arquivado; }).map(s=>s.id);
+  if (!ids.length) return render();
+  try {
+    const r = await exec(sb.from('servicos').update({arquivado:true, ...carimbo()}).in('id', ids).select('id'));
+    const ok = (r||[]).length;
+    if (!ok) throw new Error('Sem permissão');
+    S.servicos.forEach(s=>{ if (ids.includes(s.id)) s.arquivado = true; });
+    registrar(`Zerou a contagem de finalizados (${ok} ${ok>1?'trabalhos arquivados':'trabalho arquivado'})`);
+    toast(`Contagem zerada. ${ok} ${ok>1?'trabalhos finalizados foram arquivados':'trabalho finalizado foi arquivado'}.`);
+    agendar('servicos');
+  } catch(e){ erroGravar(e); }
+  render();
+}
+async function excluir(id){
+  const s = S.servicos.find(x=>x.id===id);
+  try {
+    const r = await exec(sb.from('servicos').delete().eq('id', id).select('id'));
+    if (!r || !r.length) throw new Error('Sem permissão');
+    S.servicos = S.servicos.filter(x=>x.id!==id);
+    registrar('Excluiu o trabalho', s); fecharModal(); toast('Trabalho excluído.'); render();
+  } catch(e){ erroGravar(e); }
+}
+async function salvarListas(nova, acao){
+  try {
+    const r = await exec(sb.from('config').upsert({id:1, maquinas:nova.maquinas, acabamentos:nova.acabamentos}).select('id'));
+    if (!r || !r.length) throw new Error('Sem permissão');
+    S.config = nova; registrar(acao); render(); return true;
+  } catch(e){ erroGravar(e); return false; }
+}
+async function adicionarItem(tipo, valor){
+  valor = valor.trim(); if (!valor) return;
+  const L = listas(), nova = {maquinas:[...L.maquinas], acabamentos:[...L.acabamentos]};
+  if (tipo==='maquina'){
+    if (nova.maquinas.some(m=>norm(m)===norm(valor))) return toast('Essa impressora já está cadastrada.');
+    nova.maquinas.push(valor);
+    if (await salvarListas(nova, `Cadastrou a impressora: ${valor}`)) toast('Impressora adicionada.');
+  } else {
+    if (nova.acabamentos.some(a=>norm(a.n)===norm(valor))) return toast('Esse processo já está cadastrado.');
+    let k = chaveDe(valor); while (nova.acabamentos.some(a=>a.k===k)) k += '_';
+    nova.acabamentos.push({k, n:valor});
+    if (await salvarListas(nova, `Cadastrou o processo: ${valor}`)) toast('Processo adicionado.');
+  }
+}
+async function removerItem(tipo, ix){
+  const L = listas(), nova = {maquinas:[...L.maquinas], acabamentos:[...L.acabamentos]};
+  let nome;
+  if (tipo==='maq'){ nome = nova.maquinas[ix]; nova.maquinas.splice(ix,1); }
+  else { nome = (nova.acabamentos[ix]||{}).n; nova.acabamentos.splice(ix,1); }
+  S.confirmar = null;
+  if (await salvarListas(nova, `Removeu ${tipo==='maq'?'a impressora':'o processo'}: ${nome}`)) toast('Removido.');
+  render();
+}
+async function cadastrarUsuario(form){
+  const erro = $('#usuario-erro'); erro.textContent='';
+  const nome = form.nome.value.trim(), senha = form.senha.value, admin = form.tipo.value==='admin';
+  const login = loginDe(nome);
+  if (!login) return erro.textContent='Informe o nome de usuário.';
+  if (senha.length < 6) return erro.textContent='A senha precisa ter pelo menos 6 caracteres.';
+  if (S.usuarios.some(u=>u.login===login)) return erro.textContent='Já existe um usuário com esse nome.';
+  const btn = form.querySelector('button[type=submit]'); btn.disabled=true;
+  try {
+    // cria o login sem trocar a sessão de quem está cadastrando
+    const temp = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_KEY, {auth:{persistSession:false, autoRefreshToken:false, detectSessionInUrl:false, storageKey:'grampel-cadastro'}});
+    const {data, error} = await temp.auth.signUp({email:emailDe(login), password:senha});
+    if (error){ erro.textContent = traduzirErroAuth(error); btn.disabled=false; return; }
+    if (!data.user || (Array.isArray(data.user.identities) && !data.user.identities.length)){ erro.textContent = 'Já existe um login com esse nome de usuário.'; btn.disabled=false; return; }
+    await exec(sb.from('perfis').insert({id:data.user.id, login, nome, admin}));
+    registrar(`Cadastrou o usuário ${nome} (${admin?'Administrador':'Acompanhar status'})`);
+    form.reset(); app.querySelectorAll('[data-rascunho^="u-"]').forEach(el=>{ if(el.type!=='radio') el.value=''; });
+    toast('Usuário cadastrado.');
+    agendar('perfis');
+  } catch(e){ erroGravar(e); }
+  btn.disabled=false;
+}
+async function salvarUsuario(form){
+  const id = form.dataset.id, u = S.usuarios.find(x=>x.id===id); if(!u) return;
+  const erro = $('#eu-erro');
+  const tipo = form.querySelector('input[name=tipo]:checked');
+  const admin = tipo ? tipo.value==='admin' : !!u.admin;
+  const senha = form.senha.value;
+  if (senha && senha.length < 6) return erro.textContent='A senha precisa ter pelo menos 6 caracteres.';
+  if (u.admin && !admin && S.usuarios.filter(x=>x.admin).length<=1) return erro.textContent='É preciso manter pelo menos um administrador.';
+  const mud = [];
+  try {
+    if (admin !== !!u.admin){
+      const r = await exec(sb.from('perfis').update({admin}).eq('id', id).select('id'));
+      if (!r || !r.length) throw new Error('Sem permissão');
+      mud.push(`tipo alterado para ${admin?'Administrador':'Acompanhar status'}`);
+    }
+    if (senha){ await exec(sb.rpc('redefinir_senha', {alvo:id, nova:senha})); mud.push('senha redefinida'); }
+    if (mud.length){ registrar(`Alterou o usuário ${u.nome}: ${mud.join(', ')}`); toast('Usuário atualizado.'); agendar('perfis'); }
+    fecharModal();
+  } catch(e){ erro.textContent = /Sem permiss|row-level/i.test(e.message) ? 'Sem permissão.' : 'Não foi possível salvar: ' + e.message; }
+}
+async function removerUsuario(id){
+  const u = S.usuarios.find(x=>x.id===id); if(!u) return;
+  if (u.admin && S.usuarios.filter(x=>x.admin).length<=1){ $('#eu-erro').textContent='É preciso manter pelo menos um administrador.'; return; }
+  try {
+    await exec(sb.rpc('remover_usuario', {alvo:id}));
+    S.usuarios = S.usuarios.filter(x=>x.id!==id);
+    registrar(`Removeu o usuário ${u.nome}`); fecharModal(); toast('Usuário removido.'); render();
+  } catch(e){ $('#eu-erro').textContent = 'Não foi possível remover: ' + e.message; }
+}
+
+/* ===================== Eventos ===================== */
+document.addEventListener('change', e=>{
+  const t = e.target;
+  if (t.name==='acab' && t.closest('#form-servico')){
+    S.formOrdem = S.formOrdem.filter(k=>k!==t.value);
+    if (t.checked) S.formOrdem.push(t.value);
+    desenharOrdem();
+  }
+});
+document.addEventListener('input', e=>{
+  const id = e.target.id;
+  if (id==='busca-consulta'){ S.buscaConsulta = e.target.value; render(); }
+  if (id==='busca-adm'){ S.buscaAdm = e.target.value; render(); }
+  if (id==='busca-hist'){ S.buscaHist = e.target.value; render(); }
+});
+document.addEventListener('click', e=>{
+  const t = e.target; let el;
+  if ((el = t.closest('[data-mover]'))){
+    const ix = +el.dataset.mover, j = ix + (+el.dataset.dir);
+    if (j>=0 && j<S.formOrdem.length){ [S.formOrdem[ix], S.formOrdem[j]] = [S.formOrdem[j], S.formOrdem[ix]]; desenharOrdem(); }
+    return;
+  }
+  if ((el = t.closest('[data-avancar]'))){ e.stopPropagation(); avancar(el.dataset.avancar); return; }
+  if ((el = t.closest('[data-toggle]'))){
+    const s = S.servicos.find(x=>x.id===el.dataset.id); if(!s) return;
+    const r = (s.etapas||{})[el.dataset.toggle];
+    marcarEtapa(s.id, el.dataset.toggle, !(r && r.feito)); return;
+  }
+  if ((el = t.closest('[data-expandir]'))){ const id=el.dataset.expandir; S.abertos.has(id)?S.abertos.delete(id):S.abertos.add(id); render(); return; }
+  if ((el = t.closest('[data-zerar]'))){ if (S.confirmar==='zerar') zerarFinalizados(); else { S.confirmar='zerar'; render(); } return; }
+  if ((el = t.closest('[data-filtro]'))){ S.filtroAdm = el.dataset.filtro; render(); return; }
+  if ((el = t.closest('[data-acao="novo"]'))){ abrirModal({tipo:'novo'}); return; }
+  if ((el = t.closest('[data-novo-cliente]'))){ e.stopPropagation(); abrirModal({tipo:'novo', base:el.dataset.novoCliente}); return; }
+  if ((el = t.closest('[data-editar]'))){ abrirModal({tipo:'editar', id:el.dataset.editar}); return; }
+  if ((el = t.closest('[data-excluir]'))){
+    if (S.confirmar==='excluir') excluir(el.dataset.excluir); else { S.confirmar='excluir'; renderModal(); }
+    return;
+  }
+  if ((el = t.closest('[data-rem-maq]'))){ const c='maq:'+el.dataset.remMaq; if(S.confirmar===c) removerItem('maq', +el.dataset.remMaq); else { S.confirmar=c; render(); } return; }
+  if ((el = t.closest('[data-rem-acab]'))){ const c='acab:'+el.dataset.remAcab; if(S.confirmar===c) removerItem('acab', +el.dataset.remAcab); else { S.confirmar=c; render(); } return; }
+  if ((el = t.closest('[data-editar-usuario]'))){ abrirModal({tipo:'usuario', id:el.dataset.editarUsuario}); return; }
+  if ((el = t.closest('[data-remover-usuario]'))){
+    if (S.confirmar==='rem-user') removerUsuario(el.dataset.removerUsuario);
+    else { S.confirmar='rem-user'; el.classList.add('conf'); el.textContent='Confirmar remoção'; }
+    return;
+  }
+  if ((el = t.closest('[data-ver]'))){ abrirModal({tipo:'ver', id:el.dataset.ver}); return; }
+  if (t.closest('[data-fechar]') || t.hasAttribute('data-fundo')){ fecharModal(); return; }
+});
+document.addEventListener('keydown', e=>{
+  if (e.key==='Escape' && S.modal) fecharModal();
+  if (e.key==='Enter' && e.target.matches && e.target.matches('.item[data-ver]')) abrirModal({tipo:'ver', id:e.target.dataset.ver});
+});
+document.addEventListener('submit', e=>{
+  const f = e.target; e.preventDefault();
+  if (f.id==='form-servico') salvarForm(f);
+  else if (f.id==='form-login') fazerLogin(f);
+  else if (f.id==='form-primeiro') criarPrimeiro(f);
+  else if (f.id==='form-usuario') cadastrarUsuario(f);
+  else if (f.id==='form-editar-usuario') salvarUsuario(f);
+  else if (f.dataset.formAdd){ const inp=f.querySelector('input'); const v=inp.value; inp.value=''; adicionarItem(f.dataset.formAdd, v); }
+});
+
+/* ===================== App instalável (PWA) ===================== */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); });
+}
+</script>
+</body>
+</html>
