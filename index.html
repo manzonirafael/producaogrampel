@@ -212,6 +212,13 @@ main{max-width:1240px;margin:0 auto;padding:24px 20px 60px}
 .mais{background:none;border:1px solid var(--linha);border-radius:8px;width:30px;height:30px;font-size:18px;line-height:1;color:var(--azul);display:grid;place-items:center;flex:none}
 .mais:hover{border-color:var(--azul);background:var(--azul-claro)}
 .itens{padding:0 10px 10px;display:flex;flex-direction:column;gap:8px}
+.mais.seta .ic{width:18px;height:18px;transition:transform .2s}
+.quadro.fechada .mais.seta .ic{transform:rotate(-90deg)}
+.resumo-pasta{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 14px}
+.mini-os{font-size:12.5px;font-weight:600;background:var(--fundo);border:1px solid var(--linha);color:var(--tinta);border-radius:8px;padding:5px 9px;cursor:pointer}
+.mini-os:hover{border-color:var(--azul-med)}
+.mini-os.atr{background:var(--vermelho-claro);border-color:#f0c7c3;color:var(--vermelho)}
+.mini-os.fim{background:var(--verde-claro);border-color:#bfe3cf;color:var(--verde)}
 .item{border:1px solid var(--linha);border-radius:10px;padding:10px 12px;cursor:pointer;background:#fff}
 .item:hover{border-color:var(--azul-med);background:#fafcff}
 .item:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
@@ -710,7 +717,7 @@ function render(focoBusca){
   const abaAtual = !abasPermitidas || abasPermitidas.includes(S.aba) ? S.aba : 'consulta';
   $('#abas').querySelectorAll('button').forEach(b=>{
     b.classList.toggle('ativa', b.dataset.aba===abaAtual);
-    b.classList.toggle('hidden', (abasPermitidas && !abasPermitidas.includes(b.dataset.aba)) || (b.dataset.aba==='mensagens' && !msgLiberada()));
+    b.classList.toggle('hidden', (abasPermitidas && !abasPermitidas.includes(b.dataset.aba)) || (b.dataset.aba==='mensagens' && !msgLiberada()) || (S.eu.admin && b.dataset.aba==='consulta'));
   });
   $('#titulo-aba').textContent = TITULOS[abaAtual] || '';
 
@@ -957,7 +964,7 @@ function telaProducao(){
   const conteudo = !S.carregado ? `<div class="vazio">Carregando serviços…</div>`
     : !todos.length ? `<div class="vazio">Nenhum trabalho cadastrado ainda. Use o botão “+ Novo trabalho” acima.</div>`
     : !lista.length ? `<div class="vazio">Nenhum trabalho neste filtro.</div>`
-    : `<div class="grade">${lista.map(quadroCliente).join('')}</div>`;
+    : `<div class="grade">${lista.map(g=>quadroCliente(g, false)).join('')}</div>`;
 
   return `
     <div class="acoes-topo">
@@ -981,15 +988,18 @@ function telaProducao(){
 function quadroCliente(g, leitura){
   const pasta = g.itens.length > 1;
   const primeiro = g.itens[0].s;
+  const fechada = pasta && pastasFechadas.has(norm(g.nome));
   return `
-  <section class="quadro ${pasta?'pasta':''}">
+  <section class="quadro ${pasta?'pasta':''} ${fechada?'fechada':''}">
     <div class="quadro-cab">
       ${pasta ? ICONE_PASTA : ''}
       <span class="cli" title="${esc(g.nome)}">${esc(g.nome)}</span>
       ${pasta ? `<span class="contagem">${g.itens.length} materiais</span>` : ''}
       ${leitura ? '' : `<button class="mais" data-novo-cliente="${esc(primeiro.id)}" title="Adicionar outro material para este cliente">+</button>`}
+      ${pasta ? `<button class="mais seta" data-pasta="${esc(norm(g.nome))}" aria-expanded="${!fechada}" title="${fechada?'Abrir':'Fechar'} pasta"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>` : ''}
     </div>
-    <div class="itens">${g.itens.map(({s,i})=>{ const nl = leitura ? naoLidasServico(s.id) : 0; return `
+    ${fechada ? `<div class="resumo-pasta">${g.itens.map(({s,i})=>`<span class="mini-os ${i.atrasado?'atr':''} ${i.finalizado?'fim':''}" ${leitura ? `data-consulta-ver="${esc(s.id)}"` : `data-ver="${esc(s.id)}"`} role="button" tabindex="0">O.S. ${esc(s.os)} · ${esc(i.atrasado ? 'Atrasado' : rotuloStatus(i))}</span>`).join('')}</div>` : ''}
+    <div class="itens ${fechada?'hidden':''}">${g.itens.map(({s,i})=>{ const nl = leitura ? naoLidasServico(s.id) : 0; return `
       <div class="item" ${leitura ? `data-consulta-ver="${esc(s.id)}"` : `data-ver="${esc(s.id)}"`} tabindex="0" role="button">
         <div class="item-l1"><span class="os-tag">O.S. ${esc(s.os)}</span><span class="mat-nome">${esc(s.material)}</span>${nl ? `<span class="novas-msg">${ICONE_MSG}${nl}</span>` : ''}</div>
         <div class="item-l2">${[s.quantidade, s.maquina, s.prazo?'Prazo '+fmtPrazo(s.prazo):''].filter(Boolean).map(esc).join(' · ')}</div>
@@ -1001,6 +1011,15 @@ function quadroCliente(g, leitura){
       </div>`; }).join('')}
     </div>
   </section>`;
+}
+
+// Pastas fechadas ficam guardadas só neste aparelho
+let pastasFechadas = new Set();
+try { pastasFechadas = new Set(JSON.parse(localStorage.getItem('grampel_pastas_fechadas') || '[]')); } catch(e){}
+function alternarPasta(chave){
+  pastasFechadas.has(chave) ? pastasFechadas.delete(chave) : pastasFechadas.add(chave);
+  try { localStorage.setItem('grampel_pastas_fechadas', JSON.stringify([...pastasFechadas])); } catch(e){}
+  render();
 }
 
 /* ---------- Histórico ---------- */
@@ -1844,6 +1863,7 @@ document.addEventListener('click', e=>{
   if ((el = t.closest('[data-apagar-hist]'))){ const c='hist:'+el.dataset.apagarHist; if (S.confirmar===c) apagarRegistro(el.dataset.apagarHist); else { S.confirmar=c; render(); } return; }
   if ((el = t.closest('[data-limpar-hist]'))){ if (S.confirmar==='limpar-hist') limparHistorico(); else { S.confirmar='limpar-hist'; render(); } return; }
   if ((el = t.closest('[data-zerar]'))){ if (S.confirmar==='zerar') zerarFinalizados(); else { S.confirmar='zerar'; render(); } return; }
+  if ((el = t.closest('[data-pasta]'))){ alternarPasta(el.dataset.pasta); return; }
   if ((el = t.closest('[data-consulta-ver]'))){ if (S.eu.admin) abrirModal({tipo:'ver', id:el.dataset.consultaVer}); else abrirModal({tipo:'consulta', id:el.dataset.consultaVer}); return; }
   if ((el = t.closest('[data-filtro-cons]'))){ S.filtroCons = el.dataset.filtroCons; render(); return; }
   if ((el = t.closest('[data-filtro]'))){ S.filtroAdm = el.dataset.filtro; render(); return; }
