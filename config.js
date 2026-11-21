@@ -1,15 +1,13 @@
 // =====================================================================
-//  Configuração do Supabase
-//  Copie os valores em: Supabase → Project Settings → API (ou "API Keys")
+//  Configuração do Supabase – Grampel
 // =====================================================================
 window.GRAMPEL_CONFIG = {
-  // "Project URL", algo como https://abcdefghijk.supabase.co
-  SUPABASE_URL: 'COLE_AQUI_A_URL_DO_PROJETO',
+  // Endereço do projeto no Supabase
+  SUPABASE_URL: 'https://btwrepzbnfpcqpnvsrlj.supabase.co',
 
-  // Chave pública: "anon public" ou "publishable" (NUNCA use a "service_role" / "secret")
-  SUPABASE_KEY: 'COLE_AQUI_A_CHAVE_PUBLICA',
+  // Chave pública (Publishable key, começa com sb_publishable_)
+  SUPABASE_KEY: 'sb_publishable_VfbroxuNAaKkb_7ww64oCA_LvqwKtDW',
 
-  // Domínio usado só internamente para transformar o nome de usuário em login.
-  // Ninguém recebe e-mail. Só mude se o Supabase reclamar do endereço.
+  // Usado só internamente para o login. Não precisa mudar.
   EMAIL_DOMINIO: 'grampel.app',
 };
