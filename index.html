@@ -29,16 +29,44 @@ button{cursor:pointer}
 .hidden{display:none!important}
 
 /* Topo */
-header{background:var(--azul);color:#fff;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(2,30,80,.25)}
-.topo{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:calc(10px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) 10px calc(20px + env(safe-area-inset-left));flex-wrap:wrap}
-.topo img{height:42px;display:block}
-.topo .esp{flex:1}
-.abas{display:flex;gap:4px;background:rgba(255,255,255,.12);padding:4px;border-radius:10px;flex-wrap:wrap}
-.abas button{background:transparent;border:0;color:#fff;padding:7px 13px;border-radius:7px;font-weight:600;font-size:14px;opacity:.85}
-.abas button.ativa{background:#fff;color:var(--azul);opacity:1}
-.quem{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600}
-.quem button{background:rgba(255,255,255,.14);border:0;color:#fff;border-radius:8px;padding:6px 11px;font-size:13px;font-weight:600}
-.quem button:hover{background:rgba(255,255,255,.25)}
+/* Menu lateral */
+:root{--menu-w:252px}
+body.menu-min{--menu-w:68px}
+.menu{position:fixed;top:0;left:0;bottom:0;width:var(--menu-w);background:var(--azul);color:#fff;z-index:30;display:flex;flex-direction:column;transition:width .2s ease, transform .25s ease;overflow:hidden;padding-top:env(safe-area-inset-top)}
+.menu-topo{display:flex;align-items:center;gap:12px;padding:16px 16px 22px}
+.menu-topo img{height:34px;display:block;transition:opacity .15s}
+.ic-btn{background:rgba(255,255,255,.14);border:0;color:#fff;width:36px;height:36px;border-radius:9px;display:grid;place-items:center;flex:none;padding:0}
+.ic-btn:hover{background:rgba(255,255,255,.25)}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.menu nav{display:flex;flex-direction:column;gap:4px;padding:0 10px}
+.menu nav button,.menu .menu-item{display:flex;align-items:center;gap:14px;background:transparent;border:0;color:#dbe5f5;padding:11px 12px;border-radius:9px;font-size:14.5px;font-weight:600;text-align:left;white-space:nowrap;width:100%}
+.menu nav button:hover,.menu .menu-item:hover{background:rgba(255,255,255,.12);color:#fff}
+.menu nav button.ativa{background:#fff;color:var(--azul)}
+.menu .rotulo-menu{overflow:hidden;text-overflow:ellipsis}
+.menu-rodape{margin-top:auto;border-top:1px solid rgba(255,255,255,.18);padding:12px 10px calc(14px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:4px}
+.menu-rodape .menu-user{display:flex;align-items:center;gap:14px;padding:9px 12px;color:#fff;font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden}
+body.menu-min .menu .rotulo-menu, body.menu-min .menu-topo img{display:none}
+body.menu-min .menu-topo{justify-content:center;padding-left:0;padding-right:0}
+body.menu-min .menu nav button, body.menu-min .menu .menu-item, body.menu-min .menu-user{justify-content:center;padding-left:0;padding-right:0}
+.ic-btn .ic-x{display:none}
+#menu-fundo{display:none}
+.barra-movel{display:none}
+body.logado{padding-left:var(--menu-w);transition:padding-left .2s ease}
+@media (max-width:900px){
+  body.logado{padding-left:0}
+  body.menu-min{--menu-w:252px}
+  body.menu-min .menu .rotulo-menu, body.menu-min .menu-topo img{display:block}
+  body.menu-min .menu-topo{justify-content:flex-start;padding:16px 16px 22px}
+  body.menu-min .menu nav button, body.menu-min .menu .menu-item, body.menu-min .menu-user{justify-content:flex-start;padding-left:12px;padding-right:12px}
+  .menu{width:260px;transform:translateX(-105%);box-shadow:none}
+  body.menu-aberto .menu{transform:none;box-shadow:8px 0 30px rgba(0,0,0,.3)}
+  body.menu-aberto #menu-fundo{display:block;position:fixed;inset:0;background:rgba(5,20,50,.45);z-index:25}
+  .ic-btn .ic-menu{display:none} .ic-btn .ic-x{display:block}
+  .barra-movel{display:flex;align-items:center;gap:12px;background:var(--azul);color:#fff;position:sticky;top:0;z-index:20;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;box-shadow:0 2px 10px rgba(2,30,80,.25)}
+  .barra-movel img{height:30px;display:block}
+  .barra-movel .titulo-aba{margin-left:auto;font-weight:600;font-size:14px;opacity:.9}
+  .barra-movel .ic-btn .ic-menu{display:block}
+}
 
 main{max-width:1240px;margin:0 auto;padding:24px 20px 60px}
 
@@ -169,6 +197,21 @@ main{max-width:1240px;margin:0 auto;padding:24px 20px 60px}
 .tag-tipo{font-size:12px;font-weight:600;border-radius:999px;padding:3px 9px}
 .tag-tipo.adm{background:var(--azul);color:#fff}
 .tag-tipo.acomp{background:#eef1f5;color:var(--cinza)}
+.hist-cards{display:flex;flex-direction:column;gap:10px}
+.hist-card{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:start;background:#fff;border:1px solid var(--linha);border-radius:12px;padding:12px 14px}
+.hist-card .h-ref{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.hist-card .h-cli{font-weight:600;font-size:14px}
+.hist-card .h-mat{color:var(--cinza);font-size:13px}
+.hist-card .h-acao{grid-column:1;font-size:14.5px}
+.hist-card .h-meta2{grid-column:1;font-size:12.5px;color:var(--cinza)}
+.hist-card .h-del{grid-column:2;grid-row:1 / span 3;align-self:center}
+.tag-sis{background:#eef1f5;color:var(--cinza);font-weight:700;border-radius:8px;padding:5px 9px;font-size:12.5px}
+.lixo{background:none;border:1px solid transparent;color:var(--cinza);border-radius:8px;padding:6px 8px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.lixo:hover{background:var(--vermelho-claro);color:var(--vermelho)}
+.lixo.conf{background:var(--vermelho);color:#fff}
+.lixo .ic{width:18px;height:18px}
+.hist-topo{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+.hist-topo .esp{flex:1}
 .hist-lista{list-style:none;margin:0;padding:0}
 .hist-lista li{padding:9px 0;border-bottom:1px solid var(--linha);font-size:14px}
 .hist-lista li:last-child{border-bottom:0}
@@ -220,8 +263,6 @@ ol.ordem .on{flex:1;font-weight:500}
 
 @media (max-width:900px){ .paineis{grid-template-columns:1fr} }
 @media (max-width:760px){
-  .topo{gap:10px;padding:10px 14px}
-  .topo img{height:34px}
   main{padding:16px 12px 50px}
   .kpis{grid-template-columns:repeat(2,1fr)}
   .grade{grid-template-columns:1fr}
@@ -236,20 +277,31 @@ ol.ordem .on{flex:1;font-weight:500}
 </style>
 </head>
 <body>
-<header id="cabecalho" class="hidden">
-  <div class="topo">
-    <img src="icons/logo.png" alt="Grampel Soluções Gráficas">
-    <div class="esp"></div>
-    <nav class="abas hidden" id="abas">
-      <button data-aba="producao">Produção</button>
-      <button data-aba="consulta">Consulta</button>
-      <button data-aba="historico">Histórico</button>
-      <button data-aba="cadastros">Processos de Produção</button>
-      <button data-aba="usuarios">Usuários</button>
+<div id="casca" class="hidden">
+  <aside class="menu" id="menu" aria-label="Menu principal">
+    <div class="menu-topo">
+      <button class="ic-btn" id="menu-toggle" aria-label="Recolher ou abrir o menu"><svg class="ic ic-menu" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><svg class="ic ic-x" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <img src="icons/logo.png" alt="Grampel Soluções Gráficas">
+    </div>
+    <nav id="abas">
+      <button data-aba="producao" title="Produção"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span class="rotulo-menu">Produção</span></button>
+      <button data-aba="consulta" title="Consulta"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="rotulo-menu">Consulta</span></button>
+      <button data-aba="historico" title="Histórico"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg><span class="rotulo-menu">Histórico</span></button>
+      <button data-aba="cadastros" title="Processos de Produção"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg><span class="rotulo-menu">Processos de Produção</span></button>
+      <button data-aba="usuarios" title="Usuários"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></svg><span class="rotulo-menu">Usuários</span></button>
     </nav>
-    <div class="quem"><span id="quem-nome"></span><button id="sair">Sair</button></div>
-  </div>
-</header>
+    <div class="menu-rodape">
+      <div class="menu-user" title="Usuário conectado"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg><span class="rotulo-menu" id="quem-nome"></span></div>
+      <button class="menu-item" id="sair" title="Sair"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M10 16l-4-4 4-4M6 12h10"/></svg><span class="rotulo-menu">Sair</span></button>
+    </div>
+  </aside>
+  <div id="menu-fundo"></div>
+  <header class="barra-movel">
+    <button class="ic-btn" id="menu-abrir" aria-label="Abrir menu"><svg class="ic ic-menu" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <img src="icons/logo.png" alt="Grampel Soluções Gráficas">
+    <span class="titulo-aba" id="titulo-aba"></span>
+  </header>
+</div>
 <main id="app"><div class="aviso"><h2>Carregando…</h2>Conectando ao sistema.</div></main>
 <div id="modal-raiz"></div>
 
@@ -467,11 +519,28 @@ async function sair(){
   if (estava){ try { await sb.auth.signOut(); } catch(e){} }
   await checarPrimeiroAcesso(); render();
 }
-$('#sair').addEventListener('click', sair);
+$('#sair').addEventListener('click', ()=>{ fecharMenu(); sair(); });
 $('#abas').addEventListener('click', e=>{
   const b = e.target.closest('button[data-aba]'); if(!b) return;
-  S.aba = b.dataset.aba; S.confirmar=null; render(true);
+  S.aba = b.dataset.aba; S.confirmar=null; fecharMenu(); render(true);
+  window.scrollTo(0, 0);
 });
+
+/* ===================== Menu lateral ===================== */
+const TITULOS = {producao:'Produção', consulta:'Consulta', historico:'Histórico', cadastros:'Processos de Produção', usuarios:'Usuários'};
+const ehCelular = () => window.matchMedia('(max-width:900px)').matches;
+let menuMin = false;
+try { menuMin = localStorage.getItem('grampel_menu_min') === '1'; } catch(e){}
+document.body.classList.toggle('menu-min', menuMin);
+function fecharMenu(){ document.body.classList.remove('menu-aberto'); }
+$('#menu-toggle').addEventListener('click', ()=>{
+  if (ehCelular()){ fecharMenu(); return; }
+  menuMin = !menuMin;
+  document.body.classList.toggle('menu-min', menuMin);
+  try { localStorage.setItem('grampel_menu_min', menuMin ? '1' : '0'); } catch(e){}
+});
+$('#menu-abrir').addEventListener('click', ()=>document.body.classList.add('menu-aberto'));
+$('#menu-fundo').addEventListener('click', fecharMenu);
 
 /* ===================== Histórico ===================== */
 async function registrar(acao, s){
@@ -487,20 +556,23 @@ function inscreverHistorico(){
 
 /* ===================== Renderização ===================== */
 function render(focoBusca){
-  const cab = $('#cabecalho');
+  const casca = $('#casca');
   if (S.erroDb){
-    cab.classList.add('hidden');
+    casca.classList.add('hidden'); document.body.classList.remove('logado');
     app.innerHTML = `<div class="aviso"><h2>Não foi possível acessar os dados</h2>Recarregue a página em alguns instantes. Se persistir, fale com o responsável pelo sistema.</div>`;
     return;
   }
-  if (!S.eu){ cab.classList.add('hidden'); renderLogin(); $('#modal-raiz').innerHTML=''; return; }
+  if (!S.eu){ casca.classList.add('hidden'); document.body.classList.remove('logado', 'menu-aberto'); renderLogin(); $('#modal-raiz').innerHTML=''; return; }
 
-  cab.classList.remove('hidden');
-  document.body.style.background = '';
+  casca.classList.remove('hidden');
+  document.body.classList.add('logado');
   $('#quem-nome').textContent = S.eu.nome;
-  const abas = $('#abas');
-  abas.classList.toggle('hidden', !S.eu.admin);
-  abas.querySelectorAll('button').forEach(b=>b.classList.toggle('ativa', b.dataset.aba===S.aba));
+  const abaAtual = S.eu.admin ? S.aba : 'consulta';
+  $('#abas').querySelectorAll('button').forEach(b=>{
+    b.classList.toggle('ativa', b.dataset.aba===abaAtual);
+    b.classList.toggle('hidden', !S.eu.admin && b.dataset.aba!=='consulta');
+  });
+  $('#titulo-aba').textContent = TITULOS[abaAtual] || '';
 
   const ativo = document.activeElement;
   const idFoco = ativo && ativo.id && ativo.id.startsWith('busca-') ? ativo.id : null;
@@ -752,26 +824,68 @@ function quadroCliente(g){
 }
 
 /* ---------- Histórico ---------- */
+const ICONE_LIXO = `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>`;
+function areaDoRegistro(h){
+  const a = norm(h.acao);
+  if (/usuario|administrador/.test(a)) return 'Usuários';
+  if (/impressora|processo/.test(a)) return 'Processos de Produção';
+  if (/historico/.test(a)) return 'Histórico';
+  if (/finalizados/.test(a)) return 'Produção';
+  return 'Sistema';
+}
 function telaHistorico(){
   app.style.maxWidth=''; app.style.padding='';
   const q = norm(S.buscaHist);
   const regs = S.historico.filter(h=>!q || norm([h.usuario,h.os,h.cliente,h.material,h.acao].join(' ')).includes(q));
+  const limpar = S.confirmar==='limpar-hist';
   return `
   <div class="painel">
-    <h2>Histórico de alterações</h2>
-    <p class="dica">Tudo o que é feito no sistema fica registrado aqui, com o nome de quem fez. Mostrando as últimas 400 alterações.</p>
-    <div class="barra-ferr" style="margin-bottom:10px"><input id="busca-hist" class="busca-peq" type="search" placeholder="Filtrar por usuário, O.S., cliente ou ação" value="${esc(S.buscaHist)}"></div>
+    <div class="hist-topo">
+      <div>
+        <h2>Histórico de alterações</h2>
+        <p class="dica" style="margin:0">Tudo o que é feito no sistema fica registrado aqui, com o nome de quem fez. Mostrando as últimas 400 alterações.</p>
+      </div>
+      <span class="esp"></span>
+      ${S.historico.length ? `<button class="lixo ${limpar?'conf':''}" data-limpar-hist title="Apagar todo o histórico">${ICONE_LIXO}${limpar?'Confirmar: apagar tudo':'Limpar histórico'}</button>` : ''}
+    </div>
+    ${limpar ? `<p class="dica" style="color:var(--vermelho);margin:6px 0 0">Todos os ${S.historico.length} registros serão apagados de vez. Clique de novo para confirmar.</p>` : ''}
+    <div class="barra-ferr" style="margin:14px 0 12px"><input id="busca-hist" class="busca-peq" type="search" placeholder="Filtrar por usuário, O.S., cliente ou ação" value="${esc(S.buscaHist)}"></div>
     ${!regs.length ? `<div class="vazio">${S.historico.length?'Nada encontrado.':'Nenhuma alteração registrada ainda.'}</div>` : `
-    <table class="tabela">
-      <thead><tr><th>Data e hora</th><th>Usuário</th><th class="ocultar-m">O.S. / Cliente</th><th>Alteração</th></tr></thead>
-      <tbody>${regs.map(h=>`<tr>
-        <td style="white-space:nowrap">${fmtData(h.em)}</td>
-        <td><b>${esc(h.usuario||'—')}</b></td>
-        <td class="ocultar-m">${h.os?`O.S. ${esc(h.os)}<br>`:''}<span class="mat-sub">${esc([h.cliente,h.material].filter(Boolean).join(' · '))}</span></td>
-        <td>${esc(h.acao)}</td></tr>`).join('')}
-      </tbody>
-    </table>`}
+    <div class="hist-cards">${regs.map(h=>{
+      const conf = S.confirmar==='hist:'+h.id;
+      const ref = h.os || h.cliente
+        ? `${h.os?`<span class="os-tag">O.S. ${esc(h.os)}</span>`:''}${h.cliente?`<span class="h-cli">${esc(h.cliente)}</span>`:''}${h.material?`<span class="h-mat">· ${esc(h.material)}</span>`:''}`
+        : `<span class="tag-sis">${esc(areaDoRegistro(h))}</span>`;
+      return `<div class="hist-card">
+        <div class="h-ref">${ref}</div>
+        <div class="h-acao">${esc(h.acao)}</div>
+        <div class="h-meta2"><b style="color:var(--tinta)">${esc(h.usuario||'—')}</b> · ${fmtData(h.em)}</div>
+        <div class="h-del"><button class="lixo ${conf?'conf':''}" data-apagar-hist="${esc(h.id)}" title="Apagar este registro">${ICONE_LIXO}${conf?'Apagar':''}</button></div>
+      </div>`;
+    }).join('')}</div>`}
   </div>`;
+}
+async function apagarRegistro(id){
+  S.confirmar = null;
+  try {
+    const r = await exec(sb.from('historico').delete().eq('id', Number(id)).select('id'));
+    if (!r || !r.length) throw new Error('Sem permissão');
+    S.historico = S.historico.filter(h=>String(h.id)!==String(id));
+    toast('Registro apagado.');
+  } catch(e){ erroGravar(e); }
+  render();
+}
+async function limparHistorico(){
+  S.confirmar = null;
+  try {
+    const r = await exec(sb.from('historico').delete().gte('id', 0).select('id'));
+    const n = (r||[]).length;
+    if (!n) throw new Error('Sem permissão');
+    S.historico = [];
+    await registrar(`Limpou o histórico (${n} ${n>1?'registros apagados':'registro apagado'})`);
+    toast('Histórico apagado.');
+  } catch(e){ erroGravar(e); }
+  render();
 }
 
 /* ---------- Impressoras e acabamentos ---------- */
@@ -1182,6 +1296,8 @@ document.addEventListener('click', e=>{
     marcarEtapa(s.id, el.dataset.toggle, !(r && r.feito)); return;
   }
   if ((el = t.closest('[data-expandir]'))){ const id=el.dataset.expandir; S.abertos.has(id)?S.abertos.delete(id):S.abertos.add(id); render(); return; }
+  if ((el = t.closest('[data-apagar-hist]'))){ const c='hist:'+el.dataset.apagarHist; if (S.confirmar===c) apagarRegistro(el.dataset.apagarHist); else { S.confirmar=c; render(); } return; }
+  if ((el = t.closest('[data-limpar-hist]'))){ if (S.confirmar==='limpar-hist') limparHistorico(); else { S.confirmar='limpar-hist'; render(); } return; }
   if ((el = t.closest('[data-zerar]'))){ if (S.confirmar==='zerar') zerarFinalizados(); else { S.confirmar='zerar'; render(); } return; }
   if ((el = t.closest('[data-filtro]'))){ S.filtroAdm = el.dataset.filtro; render(); return; }
   if ((el = t.closest('[data-acao="novo"]'))){ abrirModal({tipo:'novo'}); return; }
