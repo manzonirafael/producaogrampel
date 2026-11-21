@@ -63,6 +63,14 @@ body.menu-min .menu nav button, body.menu-min .menu .menu-item, body.menu-min .m
 .acoes-topo .btn{flex:none}
 .acoes-topo .chips{flex:none}
 .busca-linha{margin:0 0 18px}
+.consulta-titulo{background:var(--azul);color:#fff;text-align:center;font-weight:700;font-size:16px;letter-spacing:.02em;border-radius:12px;padding:11px 16px;margin-bottom:12px}
+.consulta-busca{position:relative;margin-bottom:14px}
+.consulta-busca .ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--azul);width:20px;height:20px}
+.consulta-busca input{width:100%;border:1px solid transparent;background:var(--azul-med);color:var(--tinta);border-radius:12px;padding:12px 14px 12px 44px;font-size:15px;outline:none}
+.consulta-busca input::placeholder{color:#3d5a8f}
+.consulta-busca input:focus{background:#fff;border-color:var(--azul);box-shadow:0 0 0 3px var(--azul-med)}
+.consulta-filtros{justify-content:center}
+.kpis + .vazio, .kpis + .grupo-cli{margin-top:6px}
 .busca-linha .busca-peq{width:100%}
 /* Calendário */
 .modal.cal-modal{max-width:440px}
@@ -841,12 +849,26 @@ function linhaDoTempo(s, editavel){
 function telaConsulta(){
   app.style.maxWidth=''; app.style.padding='';
   const q = norm(S.buscaConsulta);
+  const filtro = S.filtroCons || 'andamento';
+  // contadores (mesma regra do administrativo: trabalhos arquivados não entram)
+  const ativos = S.servicos.map(s=>({s, i:info(s)})).filter(x=>!x.i.arquivado);
+  const k = {
+    andamento: ativos.filter(x=>!x.i.finalizado).length,
+    esp: ativos.filter(x=>!x.i.finalizado && x.i.feitas===0).length,
+    atrasados: ativos.filter(x=>x.i.atrasado).length,
+    fim: ativos.filter(x=>x.i.finalizado).length,
+  };
   let corpo = '';
   if (!S.carregado) corpo = `<div class="vazio">Carregando serviços…</div>`;
   else if (!q) corpo = `<div class="vazio">Digite o número da O.S. ou o nome do cliente para ver o andamento dos materiais.</div>`;
   else {
-    const achados = S.servicos.filter(s => norm(s.os).includes(q) || norm(s.cliente).includes(q) || norm(s.material).includes(q));
-    if (!achados.length) corpo = `<div class="vazio">Nenhum serviço encontrado para “${esc(S.buscaConsulta)}”.</div>`;
+    const encontrados = S.servicos.filter(s => norm(s.os).includes(q) || norm(s.cliente).includes(q) || norm(s.material).includes(q));
+    const achados = encontrados.filter(s=>{
+      const fim = info(s).finalizado;
+      return filtro==='todos' || (filtro==='finalizados' ? fim : !fim);
+    });
+    if (!encontrados.length) corpo = `<div class="vazio">Nenhum serviço encontrado para “${esc(S.buscaConsulta)}”.</div>`;
+    else if (!achados.length) corpo = `<div class="vazio">Nenhum serviço ${filtro==='finalizados'?'finalizado':'em produção'} para “${esc(S.buscaConsulta)}”. Toque em “Todos” para ver ${encontrados.length>1?`os ${encontrados.length} encontrados`:'o encontrado'}.</div>`;
     else {
       const grupos = new Map();
       achados.sort((a,b)=>(b.criadoEm||0)-(a.criadoEm||0)).forEach(s=>{
@@ -862,14 +884,25 @@ function telaConsulta(){
     }
   }
   return `
-    <div class="busca-hero">
-      <h1>Onde está o serviço?</h1>
-      <p>Pesquise pela O.S. ou pelo nome do cliente e escolha o material.</p>
-      <div class="campo-busca">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="busca-consulta" type="search" autocomplete="off" placeholder="Ex.: 1520 ou Padaria Central" value="${esc(S.buscaConsulta)}">
+    <div class="consulta-titulo">Materiais em Produção</div>
+    <div class="consulta-busca">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="busca-consulta" type="search" autocomplete="off" placeholder="O.S. ou Nome do Cliente" value="${esc(S.buscaConsulta)}" aria-label="Buscar por O.S. ou nome do cliente">
+    </div>
+    <div class="acoes-topo consulta-filtros">
+      <div class="chips">
+        <button data-filtro-cons="andamento" class="${filtro==='andamento'?'ativa':''}">Em produção</button>
+        <button data-filtro-cons="finalizados" class="${filtro==='finalizados'?'ativa':''}">Finalizados</button>
+        <button data-filtro-cons="todos" class="${filtro==='todos'?'ativa':''}">Todos</button>
       </div>
-    </div>${corpo}`;
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="v">${k.andamento}</div><div class="r">Em produção</div></div>
+      <div class="kpi"><div class="v">${k.esp}</div><div class="r">Na 1ª etapa</div></div>
+      <div class="kpi vermelho"><div class="v">${k.atrasados}</div><div class="r">Atrasados</div></div>
+      <div class="kpi verde"><div class="v">${k.fim}</div><div class="r">Finalizados</div></div>
+    </div>
+    ${corpo}`;
 }
 function cartaoConsulta(s, abertoForcado){
   const i = info(s);
@@ -1779,6 +1812,7 @@ document.addEventListener('click', e=>{
   if ((el = t.closest('[data-apagar-hist]'))){ const c='hist:'+el.dataset.apagarHist; if (S.confirmar===c) apagarRegistro(el.dataset.apagarHist); else { S.confirmar=c; render(); } return; }
   if ((el = t.closest('[data-limpar-hist]'))){ if (S.confirmar==='limpar-hist') limparHistorico(); else { S.confirmar='limpar-hist'; render(); } return; }
   if ((el = t.closest('[data-zerar]'))){ if (S.confirmar==='zerar') zerarFinalizados(); else { S.confirmar='zerar'; render(); } return; }
+  if ((el = t.closest('[data-filtro-cons]'))){ S.filtroCons = el.dataset.filtroCons; render(); return; }
   if ((el = t.closest('[data-filtro]'))){ S.filtroAdm = el.dataset.filtro; render(); return; }
   if ((el = t.closest('[data-acao="novo"]'))){ abrirModal({tipo:'novo'}); return; }
   if ((el = t.closest('[data-novo-cliente]'))){ e.stopPropagation(); abrirModal({tipo:'novo', base:el.dataset.novoCliente}); return; }
