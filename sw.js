@@ -1,6 +1,6 @@
 // Service worker do app Grampel
 // Ao publicar uma nova versão, mude o número abaixo (v2, v3...) para os aparelhos atualizarem.
-const VERSAO = 'grampel-v1';
+const VERSAO = 'grampel-v2';
 const ARQUIVOS = [
   './',
   './index.html',

@@ -322,14 +322,13 @@ function info(s){
   const pct = finalizado ? 100 : (f.length ? Math.round(feitas / f.length * 100) : 0);
   const hoje = new Date(); hoje.setHours(0,0,0,0);
   const atrasado = !finalizado && !!s.prazo && new Date(s.prazo+'T23:59:59') < hoje;
-  const estado = finalizado ? 'fim' : (feitas===0 ? 'esp' : 'prod');
+  const estado = finalizado ? 'fim' : (f.length ? 'prod' : 'esp');
   const arquivado = !!s.arquivado;
   return {f, et, feitas, total:f.length, finalizado, atual, pct, atrasado, estado, arquivado, semEtapas: !f.length};
 }
 function rotuloStatus(i){
   if (i.semEtapas) return 'Sem etapas definidas';
   if (i.finalizado) return 'Finalizado';
-  if (i.feitas===0) return 'Aguardando início';
   return i.atual ? i.atual.n : 'Em produção';
 }
 function selo(i){
@@ -609,7 +608,7 @@ function linhaDoTempo(s, editavel){
     const r = i.et[e.k] || {};
     const cls = r.feito ? 'feito' : (i.atual && i.atual.k===e.k ? 'atual' : 'pend');
     const quando = r.feito ? `Concluído em ${fmtData(r.em)}${r.porNome?' · '+esc(r.porNome):''}`
-                 : (cls==='atual' ? (i.feitas===0 ? 'Próxima etapa' : 'Em andamento') : '');
+                 : (cls==='atual' ? 'Etapa atual' : '');
     const miolo = `<span class="marca">${r.feito?'✓':''}</span><span><div class="nome">${esc(e.n)}</div>${quando?`<div class="quando">${quando}</div>`:''}</span>`;
     html += editavel
       ? `<li class="${cls}"><button class="toggle" data-toggle="${esc(e.k)}" data-id="${esc(s.id)}" title="${r.feito?'Desmarcar':'Marcar como concluída'}">${miolo}</button></li>`
@@ -711,7 +710,7 @@ function telaProducao(){
   return `
     <div class="kpis">
       <div class="kpi"><div class="v">${k.andamento}</div><div class="r">Em produção</div></div>
-      <div class="kpi"><div class="v">${k.esp}</div><div class="r">Aguardando início</div></div>
+      <div class="kpi"><div class="v">${k.esp}</div><div class="r">Na 1ª etapa</div></div>
       <div class="kpi vermelho"><div class="v">${k.atrasados}</div><div class="r">Atrasados</div></div>
       <div class="kpi verde"><div class="v">${k.fim}</div><div class="r" style="display:flex;justify-content:space-between;align-items:center;gap:8px">Finalizados
         ${k.fim ? `<button class="btn btn-sec btn-peq" data-zerar title="Tira os finalizados da contagem e do painel de produção">${S.confirmar==='zerar'?'Confirmar':'Zerar'}</button>` : ''}</div></div>
