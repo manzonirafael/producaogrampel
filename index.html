@@ -251,6 +251,7 @@ main{max-width:1240px;margin:0 auto;padding:24px 20px 60px}
 .tag-tipo{font-size:12px;font-weight:600;border-radius:999px;padding:3px 9px}
 .tag-tipo.adm{background:var(--azul);color:#fff}
 .tag-tipo.acomp{background:#eef1f5;color:var(--cinza)}
+.tag-tipo.atend{background:var(--ambar-claro);color:var(--ambar)}
 /* Mensagens */
 .badge-menu{margin-left:auto;background:#d93b30;color:#fff;border-radius:999px;font-size:11.5px;font-weight:700;min-width:20px;height:20px;padding:0 6px;display:inline-grid;place-items:center}
 body.menu-min .menu .badge-menu{position:absolute;margin:0;transform:translate(12px,-10px);min-width:18px;height:18px;font-size:10.5px}
@@ -585,7 +586,7 @@ async function entrar(user){
     return false;
   }
   S.msgLogin = '';
-  S.eu = {id:perfil.id, login:perfil.login, nome:perfil.nome, admin:!!perfil.admin, msgAtiva:perfil.msg_ativa !== false};
+  S.eu = {id:perfil.id, login:perfil.login, nome:perfil.nome, admin:!!perfil.admin, atendimento:!!perfil.atendimento && !perfil.admin, msgAtiva:perfil.msg_ativa !== false};
   S.aba = S.eu.admin ? 'producao' : 'consulta';
   await carregarTudo();
   assinarMudancas();
@@ -612,14 +613,15 @@ async function recarregar(t){
         if (!p) return sair();
         const antes = msgLiberada();
         S.eu.msgAtiva = p.msg_ativa !== false;
-        if (p.admin){ S.eu.admin = true; agendar('perfis'); }
+        S.eu.atendimento = !!p.atendimento && !p.admin;
+        if (p.admin){ S.eu.admin = true; S.eu.atendimento = false; S.aba = 'producao'; agendar('perfis'); }
         if (antes !== msgLiberada()) agendar('mensagens');
         render(); return;
       }
-      S.usuarios = (await exec(sb.from('perfis').select('*').order('nome'))).map(u=>({id:u.id, login:u.login, nome:u.nome, admin:!!u.admin, msgAtiva:u.msg_ativa !== false}));
+      S.usuarios = (await exec(sb.from('perfis').select('*').order('nome'))).map(u=>({id:u.id, login:u.login, nome:u.nome, admin:!!u.admin, atendimento:!!u.atendimento && !u.admin, msgAtiva:u.msg_ativa !== false}));
       const eu = S.usuarios.find(u=>u.id===S.eu.id);
       if (!eu) return sair();
-      if (!eu.admin){ S.eu.admin = false; S.aba = 'consulta'; fecharModal(); }
+      if (!eu.admin){ S.eu.admin = false; S.eu.atendimento = eu.atendimento; S.aba = 'consulta'; fecharModal(); }
     } else if (t==='historico'){
       if (!S.histInscrito) return;
       S.historico = (await exec(sb.from('historico').select('*').order('em', {ascending:false}).limit(400))).map(deHist);
@@ -687,6 +689,12 @@ $('#menu-toggle').addEventListener('click', ()=>{
 });
 $('#menu-abrir').addEventListener('click', ()=>document.body.classList.add('menu-aberto'));
 $('#menu-fundo').addEventListener('click', fecharMenu);
+
+/* ===================== Tipos de perfil ===================== */
+// admin = Administrador · atend = Atendimento (só cadastra trabalhos) · acomp = Acompanhamento (só vê)
+const TIPOS = {admin:'Administrador', atend:'Atendimento', acomp:'Acompanhamento'};
+const tipoDe = u => u.admin ? 'admin' : (u.atendimento ? 'atend' : 'acomp');
+const podeCadastrar = () => !!(S.eu && (S.eu.admin || S.eu.atendimento));
 
 /* ===================== Histórico ===================== */
 async function registrar(acao, s){
@@ -895,7 +903,8 @@ function telaConsulta(){
       <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="busca-consulta" type="search" autocomplete="off" placeholder="O.S. ou Nome do Cliente" value="${esc(S.buscaConsulta)}" aria-label="Buscar por O.S. ou nome do cliente">
     </div>
-    <div class="acoes-topo consulta-filtros">
+    <div class="acoes-topo ${podeCadastrar() && !S.eu.admin ? '' : 'consulta-filtros'}">
+      ${podeCadastrar() && !S.eu.admin ? `<button class="btn btn-pri" data-acao="novo">+ Novo trabalho</button>` : ''}
       <div class="chips">
         <button data-filtro-cons="andamento" class="${filtro==='andamento'?'ativa':''}">Em produção</button>
         <button data-filtro-cons="finalizados" class="${filtro==='finalizados'?'ativa':''}">Finalizados</button>
@@ -995,7 +1004,7 @@ function quadroCliente(g, leitura){
       ${pasta ? ICONE_PASTA : ''}
       <span class="cli" title="${esc(g.nome)}">${esc(g.nome)}</span>
       ${pasta ? `<span class="contagem">${g.itens.length} materiais</span>` : ''}
-      ${leitura ? '' : `<button class="mais" data-novo-cliente="${esc(primeiro.id)}" title="Adicionar outro material para este cliente">+</button>`}
+      ${leitura && !podeCadastrar() ? '' : `<button class="mais" data-novo-cliente="${esc(primeiro.id)}" title="Adicionar outro material para este cliente">+</button>`}
       ${pasta ? `<button class="mais seta" data-pasta="${esc(norm(g.nome))}" aria-expanded="${!fechada}" title="${fechada?'Abrir':'Fechar'} pasta"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>` : ''}
     </div>
     ${fechada ? `<div class="resumo-pasta">${g.itens.map(({s,i})=>`<span class="mini-os ${i.atrasado?'atr':''} ${i.finalizado?'fim':''}" ${leitura ? `data-consulta-ver="${esc(s.id)}"` : `data-ver="${esc(s.id)}"`} role="button" tabindex="0">O.S. ${esc(s.os)} · ${esc(i.atrasado ? 'Atrasado' : rotuloStatus(i))}</span>`).join('')}</div>` : ''}
@@ -1113,12 +1122,13 @@ function telaCadastros(){
 /* ---------- Usuários ---------- */
 function telaUsuarios(){
   app.style.maxWidth=''; app.style.padding='';
-  const us = [...S.usuarios].sort((a,b)=> (b.admin-a.admin) || norm(a.nome).localeCompare(norm(b.nome)));
+  const ordemTipo = {admin:0, atend:1, acomp:2};
+  const us = [...S.usuarios].sort((a,b)=> (ordemTipo[tipoDe(a)]-ordemTipo[tipoDe(b)]) || norm(a.nome).localeCompare(norm(b.nome)));
   return `
   <div class="paineis">
     <div class="painel">
       <h2>Usuários cadastrados</h2>
-      <p class="dica">Administradores cadastram e alteram trabalhos. Quem só acompanha vê apenas a tela de consulta.</p>
+      <p class="dica">Administrador: acesso total. Atendimento: vê e cadastra trabalhos, sem alterar etapas. Acompanhamento: só vê os trabalhos.</p>
       <div class="cartao-geral">
         <div style="flex:1"><b>Mensagens no sistema</b><div class="mat-sub">${S.config && S.config.mensagensAtivas===false ? 'Desativadas para todos os usuários' : 'Ativadas — cada usuário pode ser desligado abaixo'}</div></div>
         <button class="switch ${S.config && S.config.mensagensAtivas===false ? '' : 'on'}" data-msg-geral role="switch" aria-checked="${!(S.config && S.config.mensagensAtivas===false)}" aria-label="Mensagens para todos"></button>
@@ -1126,7 +1136,7 @@ function telaUsuarios(){
       <table class="tabela"><thead><tr><th>Usuário</th><th>Tipo</th><th>Mensagens</th><th></th></tr></thead><tbody>
       ${us.map(u=>`<tr>
         <td><b>${esc(u.nome)}</b>${u.id===S.eu.id?' <span class="mat-sub">(você)</span>':''}</td>
-        <td><span class="tag-tipo ${u.admin?'adm':'acomp'}">${u.admin?'Administrador':'Acompanhar status'}</span></td>
+        <td><span class="tag-tipo ${tipoDe(u)==='acomp'?'acomp':(tipoDe(u)==='atend'?'atend':'adm')}">${TIPOS[tipoDe(u)]}</span></td>
         <td>${u.admin ? '<span class="mat-sub">Sempre</span>' : `<button class="switch ${u.msgAtiva!==false?'on':''}" data-msg-usuario="${esc(u.id)}" role="switch" aria-checked="${u.msgAtiva!==false}" aria-label="Mensagens de ${esc(u.nome)}" ${S.config && S.config.mensagensAtivas===false ? 'title="Desativadas pela chave geral"' : ''}></button>`}</td>
         <td style="text-align:right;white-space:nowrap"><button class="btn btn-sec btn-peq" data-editar-usuario="${esc(u.id)}">Editar</button></td>
       </tr>`).join('')}
@@ -1140,7 +1150,8 @@ function telaUsuarios(){
         <label class="campo" style="margin-bottom:12px">Senha<input data-rascunho="u-senha" name="senha" type="password" autocomplete="new-password"></label>
         <div class="rotulo">Tipo de acesso</div>
         <div class="radios" style="margin-bottom:12px">
-          <label><input type="radio" data-rascunho="u-tipo" name="tipo" value="acomp" checked> Apenas acompanhar status</label>
+          <label><input type="radio" data-rascunho="u-tipo" name="tipo" value="acomp" checked> Acompanhamento</label>
+          <label><input type="radio" data-rascunho="u-tipo" name="tipo" value="atend"> Atendimento</label>
           <label><input type="radio" data-rascunho="u-tipo" name="tipo" value="admin"> Administrador</label>
         </div>
         <div class="erro" id="usuario-erro"></div>
@@ -1302,9 +1313,11 @@ function modalUsuario(id){
       <div class="modal-corpo">
         <div class="rotulo">Tipo de acesso</div>
         <div class="radios" style="margin-bottom:14px">
-          <label><input type="radio" name="tipo" value="acomp" ${!u.admin?'checked':''} ${souEu?'disabled':''}> Apenas acompanhar status</label>
-          <label><input type="radio" name="tipo" value="admin" ${u.admin?'checked':''} ${souEu?'disabled':''}> Administrador</label>
+          <label><input type="radio" name="tipo" value="acomp" ${tipoDe(u)==='acomp'?'checked':''} ${souEu?'disabled':''}> Acompanhamento</label>
+          <label><input type="radio" name="tipo" value="atend" ${tipoDe(u)==='atend'?'checked':''} ${souEu?'disabled':''}> Atendimento</label>
+          <label><input type="radio" name="tipo" value="admin" ${tipoDe(u)==='admin'?'checked':''} ${souEu?'disabled':''}> Administrador</label>
         </div>
+        <p class="dica" style="margin-top:-6px">Acompanhamento: só vê os trabalhos. Atendimento: vê e cadastra trabalhos, sem alterar etapas. Administrador: acesso total.</p>
         ${souEu?'<p class="dica">Você não pode mudar o seu próprio tipo de acesso.</p>':''}
         <label class="campo">Nova senha (deixe em branco para manter)<input name="senha" type="password" autocomplete="new-password"></label>
         <div class="erro" id="eu-erro"></div>
@@ -1762,7 +1775,7 @@ async function removerItem(tipo, ix){
 }
 async function cadastrarUsuario(form){
   const erro = $('#usuario-erro'); erro.textContent='';
-  const nome = form.nome.value.trim(), senha = form.senha.value, admin = form.tipo.value==='admin';
+  const nome = form.nome.value.trim(), senha = form.senha.value, tipo = form.tipo.value, admin = tipo==='admin', atendimento = tipo==='atend';
   const login = loginDe(nome);
   if (!login) return erro.textContent='Informe o nome de usuário.';
   if (senha.length < 6) return erro.textContent='A senha precisa ter pelo menos 6 caracteres.';
@@ -1774,8 +1787,8 @@ async function cadastrarUsuario(form){
     const {data, error} = await temp.auth.signUp({email:emailDe(login), password:senha});
     if (error){ erro.textContent = traduzirErroAuth(error); btn.disabled=false; return; }
     if (!data.user || (Array.isArray(data.user.identities) && !data.user.identities.length)){ erro.textContent = 'Já existe um login com esse nome de usuário.'; btn.disabled=false; return; }
-    await exec(sb.from('perfis').insert({id:data.user.id, login, nome, admin}));
-    registrar(`Cadastrou o usuário ${nome} (${admin?'Administrador':'Acompanhar status'})`);
+    await exec(sb.from('perfis').insert({id:data.user.id, login, nome, admin, atendimento}));
+    registrar(`Cadastrou o usuário ${nome} (${TIPOS[tipo]})`);
     form.reset(); app.querySelectorAll('[data-rascunho^="u-"]').forEach(el=>{ if(el.type!=='radio') el.value=''; });
     toast('Usuário cadastrado.');
     agendar('perfis');
@@ -1786,16 +1799,17 @@ async function salvarUsuario(form){
   const id = form.dataset.id, u = S.usuarios.find(x=>x.id===id); if(!u) return;
   const erro = $('#eu-erro');
   const tipo = form.querySelector('input[name=tipo]:checked');
-  const admin = tipo ? tipo.value==='admin' : !!u.admin;
+  const novoTipo = tipo ? tipo.value : tipoDe(u);
+  const admin = novoTipo==='admin', atendimento = novoTipo==='atend';
   const senha = form.senha.value;
   if (senha && senha.length < 6) return erro.textContent='A senha precisa ter pelo menos 6 caracteres.';
   if (u.admin && !admin && S.usuarios.filter(x=>x.admin).length<=1) return erro.textContent='É preciso manter pelo menos um administrador.';
   const mud = [];
   try {
-    if (admin !== !!u.admin){
-      const r = await exec(sb.from('perfis').update({admin}).eq('id', id).select('id'));
+    if (novoTipo !== tipoDe(u)){
+      const r = await exec(sb.from('perfis').update({admin, atendimento}).eq('id', id).select('id'));
       if (!r || !r.length) throw new Error('Sem permissão');
-      mud.push(`tipo alterado para ${admin?'Administrador':'Acompanhar status'}`);
+      mud.push(`tipo alterado de ${TIPOS[tipoDe(u)]} para ${TIPOS[novoTipo]}`);
     }
     if (senha){ await exec(sb.rpc('redefinir_senha', {alvo:id, nova:senha})); mud.push('senha redefinida'); }
     if (mud.length){ registrar(`Alterou o usuário ${u.nome}: ${mud.join(', ')}`); toast('Usuário atualizado.'); agendar('perfis'); }
